@@ -2,15 +2,31 @@ import { useState } from "react";
 import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Divider } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
+// Asumsikan Anda menggunakan react-router-dom
+import { useNavigate } from "react-router";
+
 const drawerWidth = 240;
 
 export default function Header({ handleDrawerToggle }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate(); // Inisialisasi useNavigate
   
   const open = Boolean(anchorEl);
 
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+
+  // Fungsi untuk menangani logout
+  const handleLogout = () => {
+    // 1. Hapus item dari localStorage atau sessionStorage
+    localStorage.clear(); // Ganti 'userToken' dengan nama kunci yang Anda gunakan
+
+    // 2. Tutup menu
+    handleMenuClose();
+
+    // 3. Arahkan pengguna kembali ke halaman login
+    navigate("/login");
+  };
 
   return (
     <AppBar
@@ -31,13 +47,13 @@ export default function Header({ handleDrawerToggle }) {
           Dashboard
         </Typography>
         <IconButton
-          sx={{
-            width: 40, height: 40, bgcolor: "grey.300", borderRadius: "50%",
-            display: "flex", alignItems: "center", justifyContent: "center", color: "grey.600"
-          }}
+          // sx={{
+          //   width: 40, height: 40, bgcolor: "grey.300", borderRadius: "50%",
+          //   display: "flex", alignItems: "center", justifyContent: "center", color: "grey.600"
+          // }}
           onClick={handleMenuClick}
         >
-          JS
+          jsas
         </IconButton>
         <Menu
           anchorEl={anchorEl}
@@ -49,7 +65,7 @@ export default function Header({ handleDrawerToggle }) {
           <MenuItem onClick={handleMenuClose}>Profil</MenuItem>
           <MenuItem onClick={handleMenuClose}>Akun Saya</MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClose}>Keluar</MenuItem>
+          <MenuItem onClick={handleLogout}>Keluar</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>

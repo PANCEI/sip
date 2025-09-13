@@ -49,7 +49,7 @@ function App() {
               id: 2,
               menu: "Master",
               urutan: "2",
-              jenis: "File",
+              jenis: "Folder",
               submenus: [
                 {
                   id: 2,
@@ -60,6 +60,33 @@ function App() {
                 },
                 {
                   id: 3,
+                  nama_sub_menu: "Menu",
+                  url: "Menu",
+                  path: "Menu",
+                  icon: "List",
+                },
+              ],
+            },
+          },
+          {
+            id: 3,
+            id_menu: 3,
+            id_akses: 1,
+            menu: {
+              id: 3,
+              menu: "Master2",
+              urutan: "2",
+              jenis: "Folder",
+              submenus: [
+                {
+                  id: 4,
+                  nama_sub_menu: "Akses",
+                  url: "Akses",
+                  path: "Akses",
+                  icon: "Key",
+                },
+                {
+                  id: 5,
                   nama_sub_menu: "Menu",
                   url: "Menu",
                   path: "Menu",
