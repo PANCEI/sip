@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import {
   Box,
   Divider,
@@ -7,56 +8,76 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   Toolbar,
   Typography,
 } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import { NavLink } from "react-router";
+import iconMap from "../utils/IconMap";
+import { Dashboard } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
-const menuItems = [
-  { text: "Ringkasan", path: "/", icon: <HomeIcon /> },
-  { text: "Analisis", path: "/analisis", icon: <BarChartIcon /> },
-  { text: "Pengaturan", path: "/pengaturan", icon: <SettingsIcon /> },
-  { text: "Ubah Password", path: "/ubahpassword", icon: <VpnKeyIcon /> },
-  { text: "Logout", path: "/logout", icon: <LogoutIcon /> },
-];
-
-export default function Sidebar({ mobileOpen, handleDrawerToggle }) {
+export default function Sidebar({ menus, mobileOpen, handleDrawerToggle }) {
   const drawer = (
     <Box sx={{ bgcolor: "grey.900", height: "100%" }}>
+      {/* Header */}
       <Toolbar>
-        <Typography variant="h6" color="white" fontWeight="bold">SIP</Typography>
+        <Typography variant="h6" color="white" fontWeight="bold">
+          SIP
+        </Typography>
       </Toolbar>
       <Divider sx={{ bgcolor: "grey.700" }} />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to={item.path}
+
+      {/* Menu List */}
+      {menus.map((menuWrapper) => (
+        <List
+          key={menuWrapper.id}
+          subheader={
+            <ListSubheader
               sx={{
-                color: "grey.300",
-                "&.active": { bgcolor: "primary.main", color: "white" },
-                "&:hover": { bgcolor: "grey.700", color: "white" },
+                bgcolor: "grey.900",
+                color: "grey.400",
+                fontWeight: "bold",
+                lineHeight: "32px",
               }}
             >
-              <ListItemIcon sx={{ color: "inherit" }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+              {menuWrapper.menu.menu}
+            </ListSubheader>
+          }
+        >
+          {menuWrapper.menu.submenus?.map((submenu) => (
+            <ListItem key={submenu.id} disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to={`/${submenu.path.toLowerCase()}`}
+                sx={{
+                  color: "grey.300",
+                  "&.active": { bgcolor: "primary.main", color: "white" },
+                  "&:hover": { bgcolor: "grey.800", color: "white" },
+                }}
+              >
+              
+                  <ListItemIcon sx={{ color: "inherit" }}>
+                      {(() => {
+                        const IconComponent = iconMap[submenu.icon] || Dashboard;
+                        return <IconComponent />;
+                      })()}
+                    </ListItemIcon>
+                <ListItemText primary={submenu.nama_sub_menu} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      ))}
     </Box>
   );
 
   return (
-    <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+    <Box
+      component="nav"
+      sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+    >
+      {/* Mobile Drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -64,16 +85,18 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle }) {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { width: drawerWidth },
+          "& .MuiDrawer-paper": { width: drawerWidth, bgcolor: "grey.900" },
         }}
       >
         {drawer}
       </Drawer>
+
+      {/* Desktop Drawer */}
       <Drawer
         variant="permanent"
         sx={{
           display: { xs: "none", md: "block" },
-          "& .MuiDrawer-paper": { width: drawerWidth },
+          "& .MuiDrawer-paper": { width: drawerWidth, bgcolor: "grey.900" },
         }}
         open
       >

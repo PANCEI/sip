@@ -1,33 +1,112 @@
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router";
 import PrivateRoute from "./routes/PrivateRoute";
-import Home from "./Pages/Home";
 import DashboardLayout from "./layouts/DashboardLayout";
 import NotFound from "./Pages/NotFound";
 import Login from "./Pages/Login";
+import Home from "./Pages/Home";
+import Menu from "./Pages/Menu";
+
 
 function App() {
+  const [menus, setMenus] = useState([]);
+
+  // Mapping submenu.path → Komponen
+  const pageComponents = {
+    home: <Home />,
+    menu: <Menu />,
+  };
+
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const data = [
+          {
+            id: 1,
+            id_menu: 1,
+            id_akses: 1,
+            menu: {
+              id: 1,
+              menu: "Dashboard",
+              urutan: "1",
+              jenis: "File",
+              submenus: [
+                {
+                  id: 1,
+                  nama_sub_menu: "Dashboard",
+                  url: "Home",
+                  path: "Home",
+                  icon: "Dashboard",
+                },
+              ],
+            },
+          },
+          {
+            id: 2,
+            id_menu: 2,
+            id_akses: 1,
+            menu: {
+              id: 2,
+              menu: "Master",
+              urutan: "2",
+              jenis: "File",
+              submenus: [
+                {
+                  id: 2,
+                  nama_sub_menu: "Akses",
+                  url: "Akses",
+                  path: "Akses",
+                  icon: "Key",
+                },
+                {
+                  id: 3,
+                  nama_sub_menu: "Menu",
+                  url: "Menu",
+                  path: "Menu",
+                  icon: "List",
+                },
+              ],
+            },
+          },
+        ];
+
+        setMenus(data);
+      } catch (err) {
+        console.error("❌ Gagal ambil data menu:", err);
+      }
+    };
+
+    fetchMenus();
+  }, []);
+
   return (
     <Routes>
-      {/* halaman login selalu terbuka */}
       <Route path="/login" element={<Login />} />
 
-      {/* Root route pakai PrivateRoute */}
       <Route
         path="/"
         element={
           <PrivateRoute>
-            <DashboardLayout />
+            <DashboardLayout menus={menus} />
           </PrivateRoute>
         }
       >
-        {/* "/" → Home */}
         <Route index element={<Home />} />
 
-        {/* kalau ada sub route lain, taruh di sini */}
-        {/* <Route path="profile" element={<Profile />} /> */}
+        {menus.map((item) =>
+          (item.menu?.submenus || []).map((submenu) => {
+            const path = submenu.path?.toLowerCase();
+            return (
+              <Route
+                key={submenu.id}
+                path={path}
+                element={pageComponents[path] || <NotFound />}
+              />
+            );
+          })
+        )}
       </Route>
 
-      {/* fallback kalau path tidak ada */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -10,7 +10,7 @@ export default function Header({ handleDrawerToggle }) {
   const open = Boolean(anchorEl);
 
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(true);
+  const handleMenuClose = () => setAnchorEl(null);
 
   return (
     <AppBar
