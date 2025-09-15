@@ -1,0 +1,6 @@
+/* Dalam file styles.css Anda */
+.swal2-toast-on-top {
+  z-index: 99999 !important;
+  /* Sesuaikan nilai '20px' sesuai keinginan Anda */
+  top: 70px !important; 
+}

@@ -1,0 +1,4 @@
+/* In a CSS file (e.g., your_styles.css) */
+.swal2-toast-on-top {
+  z-index: 99999 !important;
+}

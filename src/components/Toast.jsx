@@ -1,25 +1,31 @@
 import Swal from "sweetalert2";
 import { useCallback } from "react";
-export const Toast=() =>{
- const Toass = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000,
-    index: 9999,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-      toast.onmouseleave = Swal.resumeTimer;
-    }
+// Make sure you import your CSS file here
+import './styles.css'; 
 
- })  ;
-   const showToast = useCallback((icon, title) => {
-    Toass.fire({
-      icon,
-      title,
+export const Toast = () => {
+    const Toass = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        // Correct way to set z-index
+        customClass: {
+            popup: 'swal2-toast-on-top'
+        },
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
     });
-  }, [Toass]);
 
-  return showToast; 
-}
+    const showToast = useCallback((icon, title) => {
+        Toass.fire({
+            icon,
+            title,
+        });
+    }, [Toass]);
+
+    return showToast;
+};

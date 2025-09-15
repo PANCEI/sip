@@ -27,8 +27,10 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from '@mui/icons-material/Edit';
 import { alertConfirmation } from "../../../components/alertConfirmation";
+import "./Menumaster.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../../components/Toast";
+
 
 export default function Menu() {
   const showToast = Toast();
@@ -128,7 +130,7 @@ export default function Menu() {
 
   return (
     <>
-      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
+      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh", zIndex: 1 }}>
         <Card sx={{ mb: 3, borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
           <CardContent>
             <Typography variant="h5" fontWeight="bold" color="text.primary">
