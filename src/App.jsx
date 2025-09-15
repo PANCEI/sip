@@ -4,8 +4,8 @@ import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import NotFound from "./Pages/NotFound";
 import Login from "./Pages/Login";
-import Home from "./Pages/Home";
-import Menu from "./Pages/Menu";
+import Home from "./Pages/home/Home";
+import Menu from "./Pages/MenuMaster/menu/Menu";
 
 
 function App() {

@@ -11,7 +11,7 @@ export const Api1= async (endpoint , method = "GET", data = null , headers = {})
                 ...headers
             },
         });
-        console.log (response);
+        //console.log (response);
         return {
             data:response.data,
             error:null,
