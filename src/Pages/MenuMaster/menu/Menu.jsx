@@ -10,6 +10,7 @@ import {
   IconButton,
   Tooltip,
   Skeleton,
+  CircularProgress, // Added for loading spinner
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
@@ -43,30 +44,32 @@ export default function Menu() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loadingData, setLoadingData] = useState(false);
-   const { confirm } = alertConfirmation();
-
-  useEffect(() => {
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submit loading
+  const { confirm } = alertConfirmation();
+  
+  const fetchmenumaster = async () => {
     setLoadingData(true);
-    const fetchmenumaster = async () => {
-      try {
-        console.log("Fetching menu data...");
-        const { data, status } = await Api1(
-          "/menu/all",
-          "GET",
-          {},
-          {
-            Authorization: `Bearer ${token}`,
-          }
-        );
-        console.log(status);
-        setMenuMaster(data.data);
-        setLoadingData(false);
-        console.log("Data fetched successfully:", data.data);
-      } catch (err) {
-        console.error("Failed to fetch menu:", err);
-        setLoadingData(false);
-      }
-    };
+    try {
+      console.log("Fetching menu data...");
+      const { data, status } = await Api1(
+        "/menu/all",
+        "GET",
+        {},
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      console.log(status);
+      setMenuMaster(data.data);
+      setLoadingData(false);
+      console.log("Data fetched successfully:", data.data);
+    } catch (err) {
+      console.error("Failed to fetch menu:", err);
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => { 
     fetchmenumaster();
   }, [token]);
 
@@ -85,39 +88,49 @@ export default function Menu() {
   };
 
   const handleFormSubmit = async (formData) => {
-    console.log("Form submitted:", formData);
-    const { data, status } = await Api1("/menu/add", "POST", formData, {
-      Authorization: `Bearer ${token}`,
-    });
-    console.log(data);
-    console.log(status);
     handleClose();
+    setIsSubmitting(true); // Start loading
+    try {
+      console.log("Form submitted:", formData);
+      const { data, status } = await Api1("/menu/add", "POST", formData, {
+        Authorization: `Bearer ${token}`,
+      });
+      console.log(data);
+      console.log(status);
+
       showToast('success', 'Data berhasil disimpan!');
+    } catch (err) {
+      console.error("Gagal menyimpan data:", err);
+      showToast('error', 'Gagal menyimpan data!');
+    } finally {
+      setIsSubmitting(false); // Stop loading
+      fetchmenumaster();
+    }
   };
 
   const handleDelete = async (menuId) => {
-    
     console.log(`Deleting menu with ID: ${menuId}`);
     const userConfirmed = await confirm({
       text: "Anda tidak akan bisa mengembalikan data ini!"
     });
-
     if (userConfirmed) {
-      // Logika untuk menghapus data
-      console.log(`Deleting item with ID: ${menuId}`);
-      // Lakukan API call untuk hapus data di sini
-      
-      // Tampilkan SweetAlert sukses setelah penghapusan
-      Swal.fire(
-        'Deleted!',
-        'Data Anda telah berhasil dihapus.',
-        'success'
-      );
+      try {
+        const { data, status } = await Api1("/menu/bin", "POST", {
+          id: menuId,
+        }, {
+          Authorization: `Bearer ${token}`,
+        });
+        console.log(data);
+        showToast('success', 'Data berhasil dihapus!');
+        fetchmenumaster();
+      } catch (err) {
+        console.error("Gagal menghapus data:", err);
+        showToast('error', 'Gagal menghapus data!');
+      }
     } else {
       console.log('Deletion cancelled.');
     }
   };
-
 
   const filteredMenus = menuMaster.filter((menu) =>
     menu.menu.toLowerCase().includes(searchQuery.toLowerCase())
@@ -139,10 +152,32 @@ export default function Menu() {
           </CardContent>
         </Card>
 
-        {/* Removed 'margin: auto' to align the box to the left */}
-        <Box sx={{ 
-          width: '80%'
+        <Box sx={{
+          width: '80%',
+          position: 'relative', // Relative position for overlay
         }}>
+          {isSubmitting && (
+            <Box sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              bgcolor: 'rgba(255, 255, 255, 0.8)',
+              zIndex: 10,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+              p: 2,
+              borderRadius: '12px',
+            }}>
+              <CircularProgress />
+              <Typography variant="h6" color="text.secondary" mt={2}>
+                Menyimpan...
+              </Typography>
+            </Box>
+          )}
           <Paper sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
             <Box
               sx={{
@@ -227,7 +262,7 @@ export default function Menu() {
                         <TableCell align="center" size="small">
                           <Tooltip title="Edit">
                             <IconButton
-                              onClick={() => handleDelete(menu.id)}
+                              // onClick={() => handleEdit(menu)}
                               color="primary"
                               aria-label="edit menu"
                             >
@@ -243,7 +278,6 @@ export default function Menu() {
                               <DeleteIcon />
                             </IconButton>
                           </Tooltip>
-                      
                         </TableCell>
                       </TableRow>
                     ))
