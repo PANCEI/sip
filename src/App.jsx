@@ -1,115 +1,31 @@
-import { useEffect, useState } from "react";
+// src/App.js
 import { Routes, Route } from "react-router";
+import { useContext } from 'react';
+import { AuthContext } from "./AuthContext";
+
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import NotFound from "./Pages/NotFound";
 import Login from "./Pages/Login";
 import Home from "./Pages/home/Home";
 import Menu from "./Pages/MenuMaster/menu/Menu";
-
+import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
-  const [menus, setMenus] = useState([]);
-
-  // Mapping submenu.path → Komponen
+  const { menus, isLoading } = useContext(AuthContext); // Dapatkan state dari context
+  
   const pageComponents = {
     home: <Home />,
     menu: <Menu />,
   };
 
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const data = [
-          {
-            id: 1,
-            id_menu: 1,
-            id_akses: 1,
-            menu: {
-              id: 1,
-              menu: "Dashboard",
-              urutan: "1",
-              jenis: "File",
-              submenus: [
-                {
-                  id: 1,
-                  nama_sub_menu: "Dashboard",
-                  url: "Home",
-                  path: "Home",
-                  icon: "Dashboard",
-                },
-              ],
-            },
-          },
-          {
-            id: 2,
-            id_menu: 2,
-            id_akses: 1,
-            menu: {
-              id: 2,
-              menu: "Master",
-              urutan: "2",
-              jenis: "Folder",
-              submenus: [
-                {
-                  id: 2,
-                  nama_sub_menu: "Akses",
-                  url: "Akses",
-                  path: "Akses",
-                  icon: "Key",
-                },
-                {
-                  id: 3,
-                  nama_sub_menu: "Menu",
-                  url: "Menu",
-                  path: "Menu",
-                  icon: "List",
-                },
-              ],
-            },
-          },
-          {
-            id: 3,
-            id_menu: 3,
-            id_akses: 1,
-            menu: {
-              id: 3,
-              menu: "Master2",
-              urutan: "2",
-              jenis: "Folder",
-              submenus: [
-                {
-                  id: 4,
-                  nama_sub_menu: "Akses",
-                  url: "Akses",
-                  path: "Akses",
-                  icon: "Key",
-                },
-                {
-                  id: 5,
-                  nama_sub_menu: "Menu",
-                  url: "Menu",
-                  path: "Menu",
-                  icon: "List",
-                },
-              ],
-            },
-          },
-        ];
-
-        setMenus(data);
-      } catch (err) {
-        console.error("❌ Gagal ambil data menu:", err);
-      }
-    };
-
-    fetchMenus();
-  }, []);
-
+  if (isLoading) {
+    return <div>Memuat...</div>;
+  }
+  
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-
       <Route
         path="/"
         element={
@@ -119,8 +35,8 @@ function App() {
         }
       >
         <Route index element={<Home />} />
-
-        {menus.map((item) =>
+        
+        {menus?.map((item) =>
           (item.menu?.submenus || []).map((submenu) => {
             const path = submenu.path?.toLowerCase();
             return (
@@ -133,7 +49,6 @@ function App() {
           })
         )}
       </Route>
-
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

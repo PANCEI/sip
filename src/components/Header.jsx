@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Divider } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
 
 // Asumsikan Anda menggunakan react-router-dom
 import { useNavigate } from "react-router";
@@ -8,6 +10,7 @@ import { useNavigate } from "react-router";
 const drawerWidth = 240;
 
 export default function Header({ handleDrawerToggle }) {
+  const {logout} = useContext(AuthContext)
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate(); // Inisialisasi useNavigate
   
@@ -19,8 +22,8 @@ export default function Header({ handleDrawerToggle }) {
   // Fungsi untuk menangani logout
   const handleLogout = () => {
     // 1. Hapus item dari localStorage atau sessionStorage
-    localStorage.clear(); // Ganti 'userToken' dengan nama kunci yang Anda gunakan
-
+    // localStorage.clear(); // Ganti 'userToken' dengan nama kunci yang Anda gunakan
+    logout();
     // 2. Tutup menu
     handleMenuClose();
 

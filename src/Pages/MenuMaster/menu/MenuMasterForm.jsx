@@ -1,22 +1,53 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Stack, FormControl, TextField, Select, MenuItem, InputLabel, Button, FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 
-export default function MenuMasterForm({ onSubmit }) {
-  const { 
-    handleSubmit, 
-    control, 
-    formState: { errors } 
+// Tambahkan prop `initialData` dan `onClose`
+export default function MenuMasterForm({ onSubmit, initialData }) {
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset, // <-- Tambahkan `reset` dari `useForm`
   } = useForm({
     defaultValues: {
+      id_menu: null, // <-- Tambahkan field ID untuk operasi edit
       namamenu: "",
       jenis: "",
       urutan: "",
     },
   });
 
+  // Gunakan `useEffect` untuk mengisi form saat `initialData` berubah
+  useEffect(() => {
+    if (initialData) {
+      // Menggunakan `reset` untuk mengisi form dengan data dari `initialData`
+      reset({
+        id_menu: initialData.id,
+        namamenu: initialData.menu,
+        jenis: initialData.jenis,
+        urutan: initialData.urutan,
+      });
+    } else {
+      // Mengosongkan form jika tidak ada data awal (mode tambah)
+      reset({
+        id_menu: null,
+        namamenu: "",
+        jenis: "",
+        urutan: "",
+      });
+    }
+  }, [initialData, reset]);
+
   const handleFormSubmit = (data) => {
-    onSubmit(data);
+    // Sesuaikan nama field agar sesuai dengan API
+    const formattedData = {
+      id: data.id_menu, // Kirim ID jika ada
+      menu: data.namamenu,
+      jenis: data.jenis,
+      urutan: parseInt(data.urutan, 10),
+    };
+    onSubmit(formattedData);
   };
 
   return (
@@ -91,9 +122,9 @@ export default function MenuMasterForm({ onSubmit }) {
             )}
           />
         </FormControl>
-        
+
         <Button type="submit" variant="contained" size="large" fullWidth>
-          Submit
+          {initialData ? "Update" : "Submit"}
         </Button>
       </Stack>
     </form>

@@ -10,7 +10,7 @@ import {
   IconButton,
   Tooltip,
   Skeleton,
-  CircularProgress,
+  CircularProgress, // Added for loading spinner
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
@@ -37,20 +37,16 @@ export default function Menu() {
   const showToast = Toast();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
-    setEditData(null); // Clear edit data when closing
-  };
+  const handleClose = () => setOpen(false);
   const [menuMaster, setMenuMaster] = useState([]);
   const [token] = useLocalStorageEncrypt("token", null);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loadingData, setLoadingData] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submit loading
   const { confirm } = alertConfirmation();
-  const [editData, setEditData] = useState(null);
-
+  
   const fetchmenumaster = async () => {
     setLoadingData(true);
     try {
@@ -73,7 +69,7 @@ export default function Menu() {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     fetchmenumaster();
   }, [token]);
 
@@ -91,46 +87,24 @@ export default function Menu() {
     setPage(0);
   };
 
-  const handleEdit = (menu) => {
-    setEditData(menu);
-    handleOpen();
-  };
-
   const handleFormSubmit = async (formData) => {
-    setIsSubmitting(true);
-     handleClose();
+    handleClose();
+    setIsSubmitting(true); // Start loading
     try {
-      if (formData.id) { // Menggunakan `formData.id` sesuai dengan format yang dikirim dari form
-        // Logika untuk EDIT
-        console.log("Submitting form for edit:", formData);
-        const { data, status } = await Api1("/menu/change", "PUT", formData, {
-          Authorization: `Bearer ${token}`,
-        });
-        console.log(data);
-        showToast('success', 'Data berhasil diperbarui!');
-      } else {
-        // Logika untuk INSERT BARU
-        console.log("Submitting form for new data:", formData);
-        const { data, status } = await Api1("/menu/add", "POST", formData, {
-          Authorization: `Bearer ${token}`,
-        });
-        if(status != 200) {
-          showToast('error', 'Gagal menyimpan data!');
-        }else{
-          showToast('success', 'Data berhasil disimpan!');
-        }
-        // console.log("daa dari api");
-        // console.log(data);
-        // console.log(status);
-        // showToast('success', 'Data berhasil disimpan!');
-      }
+      console.log("Form submitted:", formData);
+      const { data, status } = await Api1("/menu/add", "POST", formData, {
+        Authorization: `Bearer ${token}`,
+      });
+      console.log(data);
+      console.log(status);
+
+      showToast('success', 'Data berhasil disimpan!');
     } catch (err) {
-      console.error("Gagal menyimpan/memperbarui data:", err);
+      console.error("Gagal menyimpan data:", err);
       showToast('error', 'Gagal menyimpan data!');
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Stop loading
       fetchmenumaster();
-     
     }
   };
 
@@ -180,7 +154,7 @@ export default function Menu() {
 
         <Box sx={{
           width: '80%',
-          position: 'relative',
+          position: 'relative', // Relative position for overlay
         }}>
           {isSubmitting && (
             <Box sx={{
@@ -218,10 +192,7 @@ export default function Menu() {
               }}
             >
               <Button
-                onClick={() => {
-                  setEditData(null); // Make sure to clear data for "add" mode
-                  handleOpen();
-                }}
+                onClick={handleOpen}
                 variant="contained"
                 color="primary"
                 startIcon={<AddIcon />}
@@ -291,7 +262,7 @@ export default function Menu() {
                         <TableCell align="center" size="small">
                           <Tooltip title="Edit">
                             <IconButton
-                              onClick={() => handleEdit(menu)}
+                              // onClick={() => handleEdit(menu)}
                               color="primary"
                               aria-label="edit menu"
                             >
@@ -339,9 +310,9 @@ export default function Menu() {
       <PopUpCostum
         open={open}
         handleClose={handleClose}
-        title={editData ? "Edit Master Menu" : "Tambah Master Menu"}
+        title="Tambah Master Menu"
       >
-        <MenuMasterForm onSubmit={handleFormSubmit} initialData={editData} />
+        <MenuMasterForm onSubmit={handleFormSubmit} />
       </PopUpCostum>
     </>
   );

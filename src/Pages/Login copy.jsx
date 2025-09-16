@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { Container, Box, TextField, Button, Typography, Paper, Link, CircularProgress} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { styled } from '@mui/material/styles';
 import { Api1 } from '../utils/Api1';
 import { CostumAlert } from '../utils/CostumAlert';
-// import { useLocalStorageEncrypt } from '../helper/CostumHook';
+import { useLocalStorageEncrypt } from '../helper/CostumHook';
 import { useNavigate } from 'react-router';
-import { AuthContext } from '../AuthContext';
 // Komponen Paper yang disesuaikan
 const StyledPaper = styled(Paper)(({ theme }) => ({
   marginTop: theme.spacing(8),
@@ -39,10 +37,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const Login = () => {
   const navigate = useNavigate()
-   const { login } = useContext(AuthContext);
-// const [user, setUser] = useLocalStorageEncrypt("user", null);
-// const [token, setToken] = useLocalStorageEncrypt("token", null);
-// const [akses , setAkses] = useLocalStorageEncrypt('akses', null)
+const [user, setUser] = useLocalStorageEncrypt("user", null);
+const [token, setToken] = useLocalStorageEncrypt("token", null);
+const [akses , setAkses] = useLocalStorageEncrypt('akses', null)
   const { register, handleSubmit, formState: { errors } } = useForm();
   // state untuk mengolah dialog
   const [dialog, setDialog] = useState({ open: false, title: '', message: '' });
@@ -66,21 +63,18 @@ const Login = () => {
     console.error("Login gagal:", error);
     }else{
    console.log("Data dari API:", data);
-   login(data)
-    //  setUser(data.user);
-    // setToken(data.token);
-    // setAkses(data.akses);
+     setUser(data.user);
+    setToken(data.token);
+    setAkses(data.akses);
     console.log("User di hook (after setUser):", { user: data.user, token: data.token });
-    // handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
-    //  const { data: menuData, status: menuStatus } = await Api1("/menu", "GET", {}, {
-    //   Authorization: `Bearer ${data.token}`,
-    // });
-    // console.log("Data menu dari API:", menuData);
-    //  navigate("/", { state: { menus: menuData } });
+    handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
+     const { data: menuData, status: menuStatus } = await Api1("/menu", "GET", {}, {
+      Authorization: `Bearer ${data.token}`,
+    });
+    console.log("Data menu dari API:", menuData);
+     navigate("/", { state: { menus: menuData } });
    // handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
    // navigate("/")
-     handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
-      navigate("/"); // Navigasi setelah login berhasil
     }
 
   };
