@@ -277,7 +277,7 @@ export default function Menu() {
                   ) : paginatedMenus.length > 0 ? (
                     paginatedMenus.map((menu, index) => (
                       <TableRow
-                        key={menu.id_menu}
+                        key={menu.id}
                         sx={{
                           "&:hover": { bgcolor: "action.hover" },
                           "&:last-child td, &:last-child th": { border: 0 },

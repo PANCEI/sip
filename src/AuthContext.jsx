@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     setUser(data.user);
     setToken(data.token);
+   // console.log(data.token);
     setAkses(data.akses);
     // Kita tidak perlu mengambil menu di sini, karena useEffect di atas akan melakukannya secara otomatis saat token diatur.
   };

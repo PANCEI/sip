@@ -41,7 +41,6 @@ export default function Sidebar({ menus, mobileOpen, handleDrawerToggle }) {
 
       {/* Menu List */}
       {menus.map((menuWrapper) => {
-        // Render menu berdasarkan jenisnya: 'Folder' untuk dropdown, 'File' untuk menu tunggal
         const isFolder = menuWrapper.menu.jenis.toLowerCase() === "folder";
 
         return (
@@ -54,15 +53,12 @@ export default function Sidebar({ menus, mobileOpen, handleDrawerToggle }) {
                   color: "grey.400",
                   fontWeight: "bold",
                   lineHeight: "32px",
-                  marginTop:"8px",
+                  marginTop: "8px",
                 }}
-              >
-             
-              </ListSubheader>
+              ></ListSubheader>
             }
           >
             {isFolder ? (
-              // Ini untuk menu jenis 'Folder' (memiliki submenu yang bisa di-dropdown)
               <>
                 <ListItem disablePadding>
                   <ListItemButton
@@ -85,59 +81,68 @@ export default function Sidebar({ menus, mobileOpen, handleDrawerToggle }) {
                 </ListItem>
                 <Collapse in={open[menuWrapper.id]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {menuWrapper.menu.submenus?.map((submenu) => (
-                      <ListItem key={submenu.id} disablePadding sx={{ pl: 4 }}>
-                        <ListItemButton
-                          component={NavLink}
-                          to={`/${submenu.path.toLowerCase()}`}
-                          sx={{
-                            color: "grey.300",
-                            "&.active": {
-                              bgcolor: "primary.main",
-                              color: "white",
-                            },
-                            "&:hover": { bgcolor: "grey.800", color: "white" },
-                          }}
-                        >
-                          <ListItemIcon sx={{ color: "inherit" }}>
-                            {(() => {
-                              const IconComponent =
-                                iconMap[submenu.icon] || Dashboard;
-                              return <IconComponent />;
-                            })()}
-                          </ListItemIcon>
-                          <ListItemText primary={submenu.nama_sub_menu} />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
+                    {menuWrapper.menu.submenus
+                      ?.filter((submenu) => !submenu.sub) // hanya tampilkan jika submenu.sub kosong/null
+                      .map((submenu) => (
+                        <ListItem key={submenu.id} disablePadding sx={{ pl: 4 }}>
+                          <ListItemButton
+                            component={NavLink}
+                            to={`/${submenu.path.toLowerCase()}`}
+                            sx={{
+                              color: "grey.300",
+                              "&.active": {
+                                bgcolor: "primary.main",
+                                color: "white",
+                              },
+                              "&:hover": {
+                                bgcolor: "grey.800",
+                                color: "white",
+                              },
+                            }}
+                          >
+                            <ListItemIcon sx={{ color: "inherit" }}>
+                              {(() => {
+                                const IconComponent =
+                                  iconMap[submenu.icon] || Dashboard;
+                                return <IconComponent />;
+                              })()}
+                            </ListItemIcon>
+                            <ListItemText primary={submenu.nama_sub_menu} />
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
                   </List>
                 </Collapse>
               </>
             ) : (
-              // Ini untuk menu jenis 'File' (tautan langsung)
-              <ListItem key={menuWrapper.id} disablePadding>
-                <ListItemButton
-                  component={NavLink}
-                  to={`/${menuWrapper.menu.submenus?.[0]?.path.toLowerCase() || ''}`}
-                  sx={{
-                    color: "grey.300",
-                    "&.active": {
-                      bgcolor: "primary.main",
-                      color: "white",
-                    },
-                    "&:hover": { bgcolor: "grey.800", color: "white" },
-                  }}
-                >
-                  <ListItemIcon sx={{ color: "inherit" }}>
-                    {(() => {
-                      const IconComponent =
-                        iconMap[menuWrapper.menu.icon] || Dashboard;
-                      return <IconComponent />;
-                    })()}
-                  </ListItemIcon>
-                  <ListItemText primary={menuWrapper.menu.menu} />
-                </ListItemButton>
-              </ListItem>
+              // Menu jenis File → juga dicek sub nya
+              !menuWrapper.menu.submenus?.[0]?.sub && (
+                <ListItem key={menuWrapper.id} disablePadding>
+                  <ListItemButton
+                    component={NavLink}
+                    to={`/${
+                      menuWrapper.menu.submenus?.[0]?.path.toLowerCase() || ""
+                    }`}
+                    sx={{
+                      color: "grey.300",
+                      "&.active": {
+                        bgcolor: "primary.main",
+                        color: "white",
+                      },
+                      "&:hover": { bgcolor: "grey.800", color: "white" },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "inherit" }}>
+                      {(() => {
+                        const IconComponent =
+                          iconMap[menuWrapper.menu.icon] || Dashboard;
+                        return <IconComponent />;
+                      })()}
+                    </ListItemIcon>
+                    <ListItemText primary={menuWrapper.menu.menu} />
+                  </ListItemButton>
+                </ListItem>
+              )
             )}
           </List>
         );

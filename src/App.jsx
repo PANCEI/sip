@@ -9,7 +9,9 @@ import NotFound from "./Pages/NotFound";
 import Login from "./Pages/Login";
 import Home from "./Pages/home/Home";
 import Menu from "./Pages/MenuMaster/menu/Menu";
-import { useLocalStorageEncrypt } from "./helper/CostumHook";
+import Akses from "./Pages/MenuMaster/akses/Akses";
+import DetailAkses from "./Pages/MenuMaster/akses/DetailAkses";
+// import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
   const { menus, isLoading } = useContext(AuthContext); // Dapatkan state dari context
@@ -17,6 +19,8 @@ function App() {
   const pageComponents = {
     home: <Home />,
     menu: <Menu />,
+    akses: <Akses />,
+    detailakses: <DetailAkses />,
   };
 
   if (isLoading) {
@@ -39,10 +43,11 @@ function App() {
         {menus?.map((item) =>
           (item.menu?.submenus || []).map((submenu) => {
             const path = submenu.path?.toLowerCase();
+            const url = submenu.url?.toLowerCase();
             return (
               <Route
                 key={submenu.id}
-                path={path}
+                path={url}
                 element={pageComponents[path] || <NotFound />}
               />
             );
