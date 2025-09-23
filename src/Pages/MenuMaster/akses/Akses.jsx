@@ -32,8 +32,10 @@ import PopUpCostum from "../../../components/PopUpCostum";
 import AksesForm from "./AksesForm";
 import { Api } from "@mui/icons-material";
 import { alertConfirmation } from "../../../components/alertConfirmation";
+import { Toast } from "../../../components/Toast";
 
 export default function Akses() {
+   const showToast = Toast();
   const navigate = useNavigate();
   const [simpan , setSimpan] = useState(false);
   const [ambilData , setAmbilData] = useState(false);
@@ -108,7 +110,18 @@ useEffect(()=>{
     console.log(confirm2);
     if(confirm2){
       try{
-
+        const {res , status} =await Api1("/akses/delete", "DELETE", {
+          id:encryptData(id.toString()),
+        },
+      {
+         Authorization: `Bearer ${token}`,
+      });
+     console.log("datanya adalah" , res );
+     if(status == 200){
+       showToast('success', 'Data berhasil dihapus!');
+        getDataAkses();
+     }
+      // console.log(status);
       }catch(error){
         console.log(error);
         getDataAkses();
@@ -131,7 +144,7 @@ useEffect(()=>{
     console.log("data dari form adalah :" , data);
     data.akses= encryptData(data.akses);
     // pastikan yang di encrypth itu sudah string
- console.log(encryptData(data.id.toString()));
+ //console.log(encryptData(data.id.toString()));
 
     console.log("data dari form yang sudah di encrypt adalah :" , data);
     setSimpan(true);
