@@ -11,6 +11,7 @@ import Home from "./Pages/home/Home";
 import Menu from "./Pages/MenuMaster/menu/Menu";
 import Akses from "./Pages/MenuMaster/akses/Akses";
 import DetailAkses from "./Pages/MenuMaster/akses/DetailAkses";
+import SubMenu from "./Pages/MenuMaster/SubMenu/SubMenu";
 // import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     menu: <Menu />,
     akses: <Akses />,
     detailakses: <DetailAkses />,
+    submenu:<SubMenu/>,
   };
 
   if (isLoading) {
