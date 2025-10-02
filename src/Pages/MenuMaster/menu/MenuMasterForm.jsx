@@ -49,7 +49,7 @@ export default function MenuMasterForm({ onSubmit, initialData }) {
     };
     onSubmit(formattedData);
   };
-
+console.log(initialData);
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <Stack spacing={3}>

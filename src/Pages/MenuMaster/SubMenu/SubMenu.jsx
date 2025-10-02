@@ -28,7 +28,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import PopUpCostum from "../../../components/PopUpCostum";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { useEffect } from "react";
-
+import SubMenuForm from "./SubMenuForm";
 import { Toast } from "../../../components/Toast";
 
 export default function SubMenu() {
@@ -113,9 +113,13 @@ const handleTutupModal = ()=>{
 setBuka(false);
 setEditData(null)
 }
+
 const bukaModal = ()=>setBuka(true);
-console.log(paginationSubMenu);
-console.log(dataSubMenu);
+// handle form submit 
+const handleFormSimpan = async(formData)=>{
+
+}
+
   return (
     <>
     <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "80vh", zIndex: 1 }}>
@@ -234,7 +238,7 @@ console.log(dataSubMenu);
                 ) : paginationSubMenu.length > 0 ?(
                
                   <>
-                      {console.log("oke")}
+                    
                       {paginationSubMenu.map((sub, index) => (
                         <TableRow
                           key={sub.id}
@@ -314,9 +318,8 @@ console.log(dataSubMenu);
     handleClose={handleTutupModal}
     title={editdata ? "Edit Sub Mmeu" : "Tambah Sub Menu"}
     >
-
-    </PopUpCostum>
-    
+      <SubMenuForm onSubmit={handleFormSimpan} initialData={editdata} masterMenu={masterMenu}/>
+    </PopUpCostum>    
     </>
   );
 }
