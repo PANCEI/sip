@@ -30,6 +30,7 @@ import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { useEffect } from "react";
 import SubMenuForm from "./SubMenuForm";
 import { Toast } from "../../../components/Toast";
+import { alertConfirmation } from "../../../components/alertConfirmation";
 
 export default function SubMenu() {
   const [buka , setBuka] = useState(false);
@@ -42,6 +43,7 @@ const [halaman , setHalaman] = useState('');
 const [editdata , setEditData] = useState(null)
 const [barisHalaman , setBarisHalaman] = useState(5);
 const [masterMenu , setMasterMenu] = useState([]);
+const { confirm } = alertConfirmation();
  const showToast = Toast();
 const getDataSubMenu = async ()=>{
  setLoadingData(true)
@@ -55,6 +57,7 @@ const getDataSubMenu = async ()=>{
     );
     if(status === 200){
       setDataSubMenu(data.data); 
+      
     }
   }catch(error){
     console.log("Gagal Mendapatkan Data Sub Menu");
@@ -118,8 +121,81 @@ const bukaModal = ()=>setBuka(true);
 // handle form submit 
 const handleFormSimpan = async(formData)=>{
   handleTutupModal();
+  setSimpan(true);
+  try{
+    if(formData.id != null){
+      console.log("edit data");
+      const {data, status} = await Api1('/submenuchange','PUT',formData ,{
+        Authorization:`Bearer ${token}`
+      })
+      if(status === 200){
+        getDataSubMenu();
+        showToast('success', 'Data berhasil diupdate!');
+      }
+    }else{
+      console.log("insert Data ");
+      const {data , status} =  await Api1("/submenu/add", "POST", formData, {
+        Authorization:`Bearer ${token}`
+      })
+      console.log(data);
+      console.log(status);
+      if (status === 200) {
+   getDataSubMenu();
+   showToast('success', 'Data berhasil disimpan!');
+      }
+    }
+    
+  }catch(error){
+    console.log("Gagal", error);
+  }finally{
+setSimpan(false);
+  }
 console.log(formData);
 }
+// handle untuk edit
+const HandleEdit=(submenu)=>{
+  console.log(submenu);
+  setEditData(submenu);
+  bukaModal();
+
+} 
+// handle untuk delete
+const handleDelete = async (id) => {
+  const konfirmasi = await confirm({
+    text: "Anda tidak bisa mengembalikan data ini setelah dihapus.",
+  });
+
+  if (!konfirmasi) return;
+
+  // Simpan data lama untuk rollback jika gagal
+  const prevData = [...dataSubMenu];
+
+  // Optimistic update → langsung hapus dari state
+  setDataSubMenu((prev) => prev.filter((item) => item.id !== id));
+
+  try {
+    const { status } = await Api1(
+      "/submenudelete",
+      "DELETE",
+      { id },
+      { Authorization: `Bearer ${token}` }
+    );
+
+    if (status === 200 || status === 204) {
+      showToast("success", "Data berhasil dihapus!");
+    } else {
+      // rollback kalau status bukan success
+      setDataSubMenu(prevData);
+      showToast("error", "Gagal menghapus data!");
+    }
+  } catch (error) {
+    console.error(error);
+    // rollback data kalau ada error
+    setDataSubMenu(prevData);
+    showToast("error", "Terjadi kesalahan saat menghapus data!");
+  }
+};
+
 
   return (
     <>
@@ -264,18 +340,22 @@ console.log(formData);
                             {sub.icon}
                           </TableCell>
                           <TableCell size="small" component="th" scope="row">
-                            {sub.sub? "Yes" : ""}
+                            {/* {sub.sub? "Yes" : ""} */}
+                            {sub.sub === "Ya" ? "Sub" : ""}
+                            {/* {sub.sub} */}
                           </TableCell>
                           <TableCell>
                             <Tooltip
                             color="primary"
                             aria-label="edit sub menu"
+                            onClick={()=>HandleEdit(sub)}
                             >
                               <IconButton>
                               <EditIcon></EditIcon>
                               </IconButton>
                             </Tooltip>
                             <Tooltip
+                            onClick={()=>handleDelete(sub.id)}
                             color="error"
                             aria-label="hapus sub menu"
                             >

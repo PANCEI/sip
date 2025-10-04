@@ -33,7 +33,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route
-        path="/"
+        path="/*"
         element={
           <PrivateRoute>
             <DashboardLayout menus={menus} />
@@ -55,8 +55,8 @@ function App() {
             );
           })
         )}
-      </Route>
       <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }

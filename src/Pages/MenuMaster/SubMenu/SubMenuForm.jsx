@@ -182,7 +182,7 @@ return (
       label="Sub Sub Menu"
       >
         <MenuItem value="Tidak">Tidak</MenuItem>
-        <MenuItem value="YA">YA</MenuItem>
+        <MenuItem value="Ya">YA</MenuItem>
       </Select>
     )}
     />
