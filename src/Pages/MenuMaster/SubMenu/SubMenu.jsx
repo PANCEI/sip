@@ -117,7 +117,8 @@ setEditData(null)
 const bukaModal = ()=>setBuka(true);
 // handle form submit 
 const handleFormSimpan = async(formData)=>{
-
+  handleTutupModal();
+console.log(formData);
 }
 
   return (

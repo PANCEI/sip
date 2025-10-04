@@ -54,7 +54,7 @@ export default function Menu() {
   const fetchmenumaster = async () => {
     setLoadingData(true);
     try {
-      console.log("Fetching menu data...");
+   //  console.log("Fetching menu data...");
       const { data, status } = await Api1(
         "/menu/all",
         "GET",
@@ -63,10 +63,10 @@ export default function Menu() {
           Authorization: `Bearer ${token}`,
         }
       );
-      console.log(status);
+    //  console.log(status);
       setMenuMaster(data.data);
       setLoadingData(false);
-      console.log("Data fetched successfully:", data.data);
+     // console.log("Data fetched successfully:", data.data);
     } catch (err) {
       console.error("Failed to fetch menu:", err);
       setLoadingData(false);
@@ -98,6 +98,7 @@ export default function Menu() {
 
   const handleFormSubmit = async (formData) => {
     setIsSubmitting(true);
+  //  console.log(formData);
      handleClose();
     try {
       if (formData.id) { // Menggunakan `formData.id` sesuai dengan format yang dikirim dari form
@@ -135,7 +136,7 @@ export default function Menu() {
   };
 
   const handleDelete = async (menuId) => {
-    console.log(`Deleting menu with ID: ${menuId}`);
+ //   console.log(`Deleting menu with ID: ${menuId}`);
     const userConfirmed = await confirm({
       text: "Anda tidak akan bisa mengembalikan data ini!"
     });
@@ -146,7 +147,7 @@ export default function Menu() {
         }, {
           Authorization: `Bearer ${token}`,
         });
-        console.log(data);
+     //   console.log(data);
         showToast('success', 'Data berhasil dihapus!');
         fetchmenumaster();
       } catch (err) {

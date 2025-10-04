@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Stack , FormControl, TextField,Select, MenuItem, InputLabel, Button , FormHelperText } from "@mui/material";
+import { Stack , FormControl, TextField,Select, MenuItem, InputLabel, Button , FormHelperText, colors } from "@mui/material";
 import { useForm , Controller } from "react-hook-form";
 useForm
 import { useState } from "react";
@@ -143,7 +143,53 @@ return (
         </Select>
       )}
       />
+       {errors.id_menu && (
+    <FormHelperText sx={{ color: "red" }}>{errors.id_menu.message}</FormHelperText>
+  )}
     </FormControl>
+    {/* icon */}
+   <FormControl>
+  <Controller
+  name="icon"
+  control={control}
+  rules={{
+    required:"Icon wajib Di Isi"
+  }}
+  render={({field})=>(
+    <TextField
+    {...field}
+    name="icon"
+    label="Icon"
+    fullWidth
+    error={!!errors.icon}
+    helperText={errors.icon?errors.icon.message :""}
+
+    />
+  )}
+  />
+   </FormControl>
+   {/* sub */}
+   <FormControl>
+    <InputLabel id="Sub">Sub Sub Menu</InputLabel>
+    <Controller
+    name="sub"
+    control={control}
+    render={({field})=>(
+      <Select
+      {...field}
+      labelId="Sub"
+      id="sub"
+      label="Sub Sub Menu"
+      >
+        <MenuItem value="Tidak">Tidak</MenuItem>
+        <MenuItem value="YA">YA</MenuItem>
+      </Select>
+    )}
+    />
+   </FormControl>
+   <Button type="submit" variant="contained" size="large" fullWidth>
+    {initialData ?"Update" :"Simpan"}
+   </Button>
     </Stack>
   </form>
 )
