@@ -12,6 +12,7 @@ import Menu from "./Pages/MenuMaster/menu/Menu";
 import Akses from "./Pages/MenuMaster/akses/Akses";
 import DetailAkses from "./Pages/MenuMaster/akses/DetailAkses";
 import SubMenu from "./Pages/MenuMaster/SubMenu/SubMenu";
+import Medicine from "./Pages/Storage/Medicine/Medicine";
 // import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
     akses: <Akses />,
     detailakses: <DetailAkses />,
     submenu:<SubMenu/>,
+    medicine:<Medicine/>,
   };
 
   if (isLoading) {
