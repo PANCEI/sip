@@ -13,13 +13,20 @@ import {
   TableCell,
   TableBody,
   Skeleton,
+  Switch,
+  Tooltip,
+  IconButton
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import EditIcon from '@mui/icons-material/Edit';
 import { useState, useEffect } from "react";
 import { Api1 } from "../../../utils/Api1";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import PopUpCostum from "../../../components/PopUpCostum";
 import MasterObatForm from "./MasterObarForm";
+import { Toast } from "../../../components/Toast";
 
 export default function MasterObat() {
   const [masterObat, setMasterObat] = useState([]);
@@ -28,7 +35,7 @@ export default function MasterObat() {
   const [loadingData, setLoadingData] = useState(false);
   const [editData, setEditData] = useState(null);
   const [open, setOpen] = useState(false);
-
+  const showToast = Toast();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
@@ -57,6 +64,7 @@ export default function MasterObat() {
     fetchMasterObat();
   }, [token]);
 
+  // tambah data
   const handleFormSubmit = async (formData) => {
     handleClose();
     try {
@@ -74,9 +82,41 @@ export default function MasterObat() {
     }
   };
 
+  // toggle aktif/nonaktif
+  const handleToggleStatus = async (item) => {
+    try {
+      const newStatus = item.flag_delete === 1 ? 0 : 1;
+      const { data, status } = await Api1(
+        `/update-flag-master-obat`,
+        "PUT",
+        { flag_delete: newStatus,
+          kode_obat:item.kode_obat
+         },
+        { Authorization: `Bearer ${token}` }
+      );
+      console.log(data);
+      if (status === 200) {
+        setMasterObat((prev) =>
+          prev.map((obat) =>
+            obat.kode_obat === item.kode_obat
+              ? { ...obat, flag_delete: newStatus }
+              : obat
+          )
+        );
+        showToast("success", data.data); 
+      }
+    } catch (error) {
+      console.error("Gagal ubah status:", error);
+    }
+  };
+
   const filtered = masterObat.filter((item) =>
     item.nama_obat?.toLowerCase().includes(pencarian.toLowerCase())
   );
+  // untuk edit data masster obat
+  const handleEdit =(item) =>{
+    console.log(item);
+  }
 
   return (
     <Box sx={{ p: 2, bgcolor: "grey.100", minHeight: "100vh" }}>
@@ -134,7 +174,15 @@ export default function MasterObat() {
           <TableContainer>
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow
+                  sx={{
+                    "& th": {
+                      fontWeight: "bold",
+                      bgcolor: "success.main",
+                      color: "white",
+                    },
+                  }}
+                >
                   <TableCell>Kode Obat</TableCell>
                   <TableCell>Nama Obat</TableCell>
                   <TableCell>Status</TableCell>
@@ -164,8 +212,43 @@ export default function MasterObat() {
                     <TableRow key={i}>
                       <TableCell>{item.kode_obat}</TableCell>
                       <TableCell>{item.nama_obat}</TableCell>
-                      <TableCell>{item.flag_delete === "Y" ? "Nonaktif" : "Aktif"}</TableCell>
-                      <TableCell>-</TableCell>
+                      <TableCell>
+                        <Tooltip
+                          title={
+                            item.flag_delete === 1
+                              ? "Klik untuk mengaktifkan"
+                              : "Klik untuk menonaktifkan"
+                          }
+                        >
+                          <Switch
+                            checked={item.flag_delete === 0}
+                            onChange={() => handleToggleStatus(item)}
+                            color={item.flag_delete === 1 ? "error" : "success"}
+                          />
+                        </Tooltip>
+                        {item.flag_delete === 1 ? "Nonaktif" : "Aktif"}
+                      </TableCell>
+                      <TableCell>
+                        {/* tombiol untuk delete sama edit */}
+                        <Tooltip
+                        color="primary"
+                        aria-label="Edit Master Obat"
+                        onClick={()=>handleEdit(item)}
+                        >
+                            <IconButton>
+                              <EditIcon></EditIcon>
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                        color="error"
+                        aria-label="delete master obat"
+                        >
+                          <IconButton>
+                            <DeleteIcon></DeleteIcon>
+                          </IconButton>
+
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -187,7 +270,7 @@ export default function MasterObat() {
         handleClose={handleClose}
         title={editData ? "Edit Master Obat" : "Tambah Master Obat"}
       >
-      
+        <MasterObatForm onSubmit={handleFormSubmit} initialData={editData} />
       </PopUpCostum>
     </Box>
   );
