@@ -12,6 +12,7 @@ export default function MasterObatForm({ onSubmit, initialData }) {
     defaultValues: {
       kode_obat: "",
       nama_obat: "",
+      flag_delete: "",
     },
   });
 
@@ -21,6 +22,7 @@ export default function MasterObatForm({ onSubmit, initialData }) {
         reset({
           kode_obat: initialData.kode_obat,
           nama_obat: initialData.nama_obat,
+          flag_delete: initialData.flag_delete,
         });
         setLoading(false);
       } else {
@@ -43,6 +45,7 @@ export default function MasterObatForm({ onSubmit, initialData }) {
         reset({
           kode_obat: data.data,
           nama_obat: "",
+          flag_delete: "tidak",
         });
       }
     } catch (error) {
@@ -56,6 +59,7 @@ export default function MasterObatForm({ onSubmit, initialData }) {
     onSubmit({
       kode_obat: data.kode_obat,
       nama_obat: data.nama_obat,
+      flag_delete: data.flag_delete,
     });
   };
 

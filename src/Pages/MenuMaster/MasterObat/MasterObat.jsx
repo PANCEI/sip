@@ -15,8 +15,10 @@ import {
   Skeleton,
   Switch,
   Tooltip,
-  IconButton
+  IconButton,
+  TablePagination,
 } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
@@ -27,8 +29,10 @@ import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import PopUpCostum from "../../../components/PopUpCostum";
 import MasterObatForm from "./MasterObarForm";
 import { Toast } from "../../../components/Toast";
+import { alertConfirmation } from "../../../components/alertConfirmation";
 
 export default function MasterObat() {
+  const { confirm } = alertConfirmation();
   const [masterObat, setMasterObat] = useState([]);
   const [pencarian, setPencarian] = useState("");
   const [token] = useLocalStorageEncrypt("token", null);
@@ -41,7 +45,15 @@ export default function MasterObat() {
     setOpen(false);
     setEditData(null);
   };
-
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+ const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+   const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
   // ambil data semua obat
   const fetchMasterObat = async () => {
     try {
@@ -68,22 +80,45 @@ export default function MasterObat() {
   const handleFormSubmit = async (formData) => {
     handleClose();
     try {
-      const { data, status } = await Api1(
-        "/add-master-obat",
-        "POST",
-        formData,
-        { Authorization: `Bearer ${token}` }
-      );
-      if (status === 201 || status === 200) {
-        await fetchMasterObat();
+      if(formData.flag_delete === "tidak"){
+        setLoadingData(true);
+        
+        const { data, status } = await Api1(
+          "/add-master-obat",
+          "POST",
+          formData,
+          { Authorization: `Bearer ${token}` }
+        );
+        if (status === 201 || status === 200) {
+          await fetchMasterObat();
+           setLoadingData(false);
+        }
+      }else{
+        // edit
+        setLoadingData(true);
+        console.log(formData)
+        const {data , status} = await Api1(
+          `/update-nama-master-obat`,
+          "PUT",
+          formData,
+          { Authorization: `Bearer ${token}` }
+        );
+         if (status === 201 || status === 200) {
+          await fetchMasterObat();
+           setLoadingData(false);
+        }
+
       }
+
     } catch (error) {
       console.error("Gagal tambah obat:", error);
+       setLoadingData(false);
     }
   };
 
   // toggle aktif/nonaktif
   const handleToggleStatus = async (item) => {
+    setLoadingData(true);
     try {
       const newStatus = item.flag_delete === 1 ? 0 : 1;
       const { data, status } = await Api1(
@@ -104,9 +139,11 @@ export default function MasterObat() {
           )
         );
         showToast("success", data.data); 
+            setLoadingData(false);
       }
     } catch (error) {
       console.error("Gagal ubah status:", error);
+       setLoadingData(false);
     }
   };
 
@@ -116,7 +153,42 @@ export default function MasterObat() {
   // untuk edit data masster obat
   const handleEdit =(item) =>{
     console.log(item);
+    setEditData(item);
+    handleOpen();
+
   }
+//  untuk delete data master obat
+const deleteData = async(item)=>{
+  const konfirmasi = await confirm({
+    text: "Anda tidak bisa mengembalikan data ini setelah dihapus.",
+  });
+   if (!konfirmasi) return;
+   const prevData = [...masterObat];
+   setMasterObat(prevData.filter((obat) => obat.kode_obat !== item));
+  console.log(item);
+      setLoadingData(true);
+  try{
+    
+    const  {data , status} = await Api1(
+      `/delete-master-obat`,
+      "DELETE",
+      {kode_obat:item},
+      { Authorization: `Bearer ${token}` }
+
+    );
+    if(status === 200){
+      showToast("success", data.data);
+     // await fetchMasterObat();
+    }
+
+  }catch(error){
+    console.error("gagal delete data master obat :", error);
+    setMasterObat(prevData);
+
+  }finally{
+    setLoadingData(false);
+  }
+}
 
   return (
     <Box sx={{ p: 2, bgcolor: "grey.100", minHeight: "100vh" }}>
@@ -162,6 +234,15 @@ export default function MasterObat() {
               size="small"
               value={pencarian}
               onChange={(e) => setPencarian(e.target.value)}
+                 slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               sx={{
                 width: { xs: "100%", sm: "auto" },
                 mt: { xs: 2, sm: 0 },
@@ -191,7 +272,7 @@ export default function MasterObat() {
               </TableHead>
               <TableBody>
                 {loadingData ? (
-                  Array.from({ length: 3 }).map((_, i) => (
+                  Array.from({ length: 1 }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell>
                         <Skeleton variant="text" />
@@ -242,6 +323,7 @@ export default function MasterObat() {
                         <Tooltip
                         color="error"
                         aria-label="delete master obat"
+                        onClick={()=>deleteData(item.kode_obat)}
                         >
                           <IconButton>
                             <DeleteIcon></DeleteIcon>
@@ -261,6 +343,16 @@ export default function MasterObat() {
               </TableBody>
             </Table>
           </TableContainer>
+           <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={filtered.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        sx={{ borderTop: "1px solid", borderColor: "grey.200" }}
+                      />
         </Paper>
       </Box>
 
