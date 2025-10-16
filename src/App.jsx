@@ -14,6 +14,7 @@ import DetailAkses from "./Pages/MenuMaster/akses/DetailAkses";
 import SubMenu from "./Pages/MenuMaster/SubMenu/SubMenu";
 import Medicine from "./Pages/Storage/Medicine/Medicine";
 import MasterObat from "./Pages/MenuMaster/MasterObat/MasterObat";
+import KategoriObat from "./Pages/MenuMaster/KategoriObat/KategoriObat";
 // import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
     submenu:<SubMenu/>,
     medicine:<Medicine/>,
     masterobat:<MasterObat/>,
+    kategoriobat:<KategoriObat/>,
   };
 
   if (isLoading) {
