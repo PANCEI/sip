@@ -23,9 +23,11 @@ import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { useState } from "react";
 import {useEffect} from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
+import KategoriObatForm from "./KategoriObatForm";
 export default function KategoriObat() {
     const [loadingData, setLoadingData] = useState(false);
     const [masterKategori, setMasterKategori] = useState([]);
+     const [searchQuery, setSearchQuery] = useState("");
     const [page, setpage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5)
     const [token]= useLocalStorageEncrypt('token', null);
@@ -35,6 +37,10 @@ export default function KategoriObat() {
       const handleClose = () => {
     setBuka(false);
     setEditKategori(null); // Clear edit data when closing
+  };
+  const handleEditKategori = (kategori) => {
+    setEditKategori(kategori);
+    bukaModal();
   };
     console.log(token);
     // get data master kategori
@@ -58,6 +64,36 @@ export default function KategoriObat() {
     useEffect(()=>{
       fetchMasterKategori();
     },[token]);
+     const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setpage(0);
+  };
+    const handleChangePage = (event, newPage) => {
+      setpage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setpage(0);
+    };
+    const filteredkategori = masterKategori.filter((kategori) =>
+    kategori.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const paginatedKategori = filteredkategori.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+const handleFormSubmit = async (formData) => {
+  console.log("Data yang dikirim dari form:", formData);
+  handleClose();
+  // Tambahkan logika untuk mengirim data ke server di sini
+  try{
+    
+  }catch(error){
+  }finally{
+  }
+}
   return (
       <>
     <Box sx={{p:3 , bgcolor:"grey.100", minHeight:"70vh" , zIndex:1}}>
@@ -160,6 +196,16 @@ export default function KategoriObat() {
                     </TableBody>
                 </Table>
             </TableContainer>
+             <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filteredkategori.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{ borderTop: "1px solid", borderColor: "grey.200" }}
+            />
             </Paper>
         </Box>
       
@@ -171,7 +217,10 @@ export default function KategoriObat() {
       >
         {/* Konten modal untuk tambah atau edit kategori obat */}
         
-
+        <KategoriObatForm
+          onSubmit={handleFormSubmit}
+          initialData={editKategori}
+        />
 
     </PopUpCostum>
 
