@@ -24,7 +24,9 @@ import { useState } from "react";
 import {useEffect} from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
 import KategoriObatForm from "./KategoriObatForm";
+import { Toast } from "../../../components/Toast";
 export default function KategoriObat() {
+  const bukaToast = Toast();
     const [loadingData, setLoadingData] = useState(false);
     const [masterKategori, setMasterKategori] = useState([]);
      const [searchQuery, setSearchQuery] = useState("");
@@ -46,6 +48,7 @@ export default function KategoriObat() {
     // get data master kategori
     const fetchMasterKategori = async ()=>{
       //  
+      setLoadingData(true);
       try{
         const {data , status} = await Api1(
           '/all-katogori-medicine',
@@ -55,10 +58,13 @@ export default function KategoriObat() {
             Authorization: `Bearer ${token}`,
           }
         );
+        if(status == 200){
+         console.log("data master kategori : ", data.data);
+        }
       }catch(error){
         console.log("gagal mendapatkan data : ". error);
       }finally{
-
+setLoadingData(false);
       }
     }
     useEffect(()=>{
@@ -89,9 +95,27 @@ const handleFormSubmit = async (formData) => {
   handleClose();
   // Tambahkan logika untuk mengirim data ke server di sini
   try{
-    
+    // cek jika formdata memiiki id maka itu adalah edit
+    if(formData.id){
+
+    }else{
+      // tambah data baru
+      const {data, status} = await Api1("/add-kategori-medicine", "POST", formData, {
+        Authorization: `Bearer ${token}`,
+      }
+      );
+      if(status ==200){
+        bukaToast('success', 'Berhasil menambahkan kategori obat');
+        fetchMasterKategori();
+      }else{
+        bukaToast('error', 'Gagal menambahkan kategori obat');
+      }
+      console.log("data tambah kategori : ", data);
+      console.log("status", status);
+    }
   }catch(error){
-  }finally{
+    console.log("gagal mengirim data : ", error);
+    bukaToast('error', 'Terjadi kesalahan saat mengirim data');
   }
 }
   return (
