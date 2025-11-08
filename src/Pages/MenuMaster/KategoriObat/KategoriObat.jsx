@@ -25,6 +25,9 @@ import {useEffect} from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
 import KategoriObatForm from "./KategoriObatForm";
 import { Toast } from "../../../components/Toast";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import { alertConfirmation } from "../../../components/alertConfirmation";
 export default function KategoriObat() {
   const bukaToast = Toast();
     const [loadingData, setLoadingData] = useState(false);
@@ -36,6 +39,7 @@ export default function KategoriObat() {
     const [editKategori, setEditKategori] = useState(null);
     const [buka , setBuka] = useState(false);
      const bukaModal = () => setBuka(true);
+     const {confirm} = alertConfirmation();
       const handleClose = () => {
     setBuka(false);
     setEditKategori(null); // Clear edit data when closing
@@ -60,6 +64,8 @@ export default function KategoriObat() {
         );
         if(status == 200){
          console.log("data master kategori : ", data.data);
+         setMasterKategori(data.data);
+         console.log("master kategori state : ", masterKategori);
         }
       }catch(error){
         console.log("gagal mendapatkan data : ". error);
@@ -83,7 +89,7 @@ setLoadingData(false);
       setpage(0);
     };
     const filteredkategori = masterKategori.filter((kategori) =>
-    kategori.name.toLowerCase().includes(searchQuery.toLowerCase())
+    kategori.nama_kategori.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const paginatedKategori = filteredkategori.slice(
     page * rowsPerPage,
@@ -97,7 +103,17 @@ const handleFormSubmit = async (formData) => {
   try{
     // cek jika formdata memiiki id maka itu adalah edit
     if(formData.id){
-
+console.log("melakukan edit data kategori");
+const {data, status} = await Api1("/update-kategori-medicine", "PUT", formData, {
+        Authorization: `Bearer ${token}`,
+      }
+      );
+      console.log("data edit kategori : ", data);
+      console.log("status", status);
+      if(status ==200){
+        bukaToast('success', 'Berhasil mengedit kategori obat');
+        fetchMasterKategori();
+      }
     }else{
       // tambah data baru
       const {data, status} = await Api1("/add-kategori-medicine", "POST", formData, {
@@ -117,6 +133,30 @@ const handleFormSubmit = async (formData) => {
     console.log("gagal mengirim data : ", error);
     bukaToast('error', 'Terjadi kesalahan saat mengirim data');
   }
+}
+const handleDeleteKategori = async (kategoriId) => {
+//console.log("Menghapus kategori dengan ID:", kategoriId);
+const useConfirmed = await confirm({
+   text: "Anda tidak akan bisa mengembalikan data ini!"
+})
+if (useConfirmed){
+  console.log("gass delete data kategori id : ", kategoriId);
+  try{
+// mela[ukan delete data]
+const {data , status} = await Api1('/delete-kategori-medicine', "DELETE", {id: kategoriId}, {
+  Authorization: `Bearer ${token}`,
+});
+console.log("data delete kategori : ", data);
+console.log("status delete kategori : ", status);
+if(status ==200){
+  fetchMasterKategori();
+  bukaToast('success', 'Berhasil menghapus kategori obat');
+}
+  }catch(error){
+    console.log('gagal menghapus kategori : ', error);
+    bukaToast('error', 'Gagal menghapus kategori obat');
+  }
+}
 }
   return (
       <>
@@ -164,6 +204,8 @@ const handleFormSubmit = async (formData) => {
                 size="small"
                 variant="outlined"
                 label="Cari Kategori"
+                value={searchQuery}
+                onChange={handleSearchChange}
                 slotProps={{
                     input: {
                     startAdornment: (
@@ -207,7 +249,34 @@ const handleFormSubmit = async (formData) => {
                             <TableCell align="center"><Skeleton variant="rectangular" width={60} height={36} sx={{ margin: 'auto' }} /></TableCell>
                             </TableRow>
                               ))
-                        ): (
+                        ): paginatedKategori.length > 0 ? (
+                          paginatedKategori.map((kategori) => (
+                            <TableRow key={kategori.id}>
+                              <TableCell>{kategori.nama_kategori}</TableCell>
+                              <TableCell>{kategori.deskripsi}</TableCell>
+                              <TableCell align="center" size="small">
+                                <Tooltip title="Edit Kategori">
+                                  <IconButton
+                                  color="primary"
+                                  aria-label="Edit Kategori"
+                                  onClick={()=>handleEditKategori(kategori)}
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Hapus Kategori">
+                                  <IconButton
+                                  color="error"
+                                  aria-label="Hapus Kategori"
+                                  onClick={()=> handleDeleteKategori(kategori.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
+                              </TableRow>
+                          ))
+                        ) :(
                           <TableRow>
                       <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
