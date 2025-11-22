@@ -34,6 +34,10 @@ import { Toast } from "../../../components/Toast";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from "@mui/icons-material/Delete";
 export default function SatuanObat() {
+  // state untuk menampung pesan toast
+  const bukaToast = Toast();
+  // state untuk menampung alert confirmation
+  const {confirm} = alertConfirmation();
   // statue untuk pencarian
   const [searchQuery, setSearchQuery] = useState("");
   // untuk pagination
@@ -83,11 +87,31 @@ const handleCloseModal = () => {
     handleCloseModal();
     // Tambahkan logika untuk mengirim data ke server di sini
     try{
-      const { data, status } = await Api1('/add-satuan-medicine', 'POST', formData, {
-        Authorization: `Bearer ${token}`,
-      });
-      console.log("Response data after form submission:", data);
-      console.log("Response status after form submission:", status);
+      if(formData.id){
+        // update data
+        console.log("Updating satuan obat with id:", formData.id);
+        const { data, status } = await Api1('/update-satuan-medicine', 'PUT', formData, {
+          Authorization: `Bearer ${token}`,
+        });
+        console.log("Response data after form submission:", data);
+        console.log("Response status after form submission:", status);
+        if(status === 200){
+          fetchSatuanObat();
+          bukaToast("success", "Satuan Obat berhasil diupdate");
+        }
+
+      }else{
+        // insert data baru
+        const { data, status } = await Api1('/add-satuan-medicine', 'POST', formData, {
+          Authorization: `Bearer ${token}`,
+        });
+        console.log("Response data after form submission:", data);
+        console.log("Response status after form submission:", status);
+        if(status === 200){
+          fetchSatuanObat();
+          bukaToast("success", "Satuan Obat berhasil ditambahkan");
+        }
+      }
     }catch(error){
       console.error("Error submitting form data:", error);
     }
@@ -109,7 +133,35 @@ const handleCloseModal = () => {
     page * rowsPerPage + rowsPerPage
   );
   // akhir pagination
-  
+  // fungsi handle delete satuan obat
+  const handleDeleteSatuanObat = async (id) => {
+    const useConfirmed = await confirm({
+      text: "Anda tidak akan bisa mengembalikan data ini!"
+    })
+    if(useConfirmed){
+      try{
+    console.log("Delete satuan obat with id:", id);
+    const {data, status}  = await Api1('/delete-satuan-medicine','DELETE',{id},{
+  Authorization: `Bearer ${token}`,
+    });
+    console.log("Response data after delete:", data);
+    console.log("Response status after delete:", status);
+    if(status === 200){
+      fetchSatuanObat();
+      bukaToast("success", "Satuan Obat berhasil dihapus");
+    }
+ 
+  }catch(error){
+  console.error("Error deleting satuan obat:", error);
+ }
+}
+  }
+  // akhir fungsi delete satuan obat
+  // awal fungsi pencarian 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(0); // Reset ke halaman pertama saat pencarian berubah
+  }
   return (
     <>
     <Box sx={{p:3, bgcolor:"grey.100" , minHeight:"70vh", zIndex:1}}>
@@ -155,7 +207,8 @@ const handleCloseModal = () => {
                 size="small"
                 variant="outlined"
                 label="Cari Satuan Obat"
-              
+                value={searchQuery}
+                onChange={handleSearchChange}
                 slotProps={{
                     input: {
                     startAdornment: (
@@ -218,6 +271,7 @@ const handleCloseModal = () => {
                                         <Tooltip title="Hapus">
                                           <IconButton
                                             color="error"
+                                            onClick={() => handleDeleteSatuanObat(item.id)}
                                             >
                                             <DeleteIcon />
                                             </IconButton>
