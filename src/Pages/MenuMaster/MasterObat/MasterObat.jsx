@@ -266,7 +266,9 @@ const deleteData = async(item)=>{
                 >
                   <TableCell>Kode Obat</TableCell>
                   <TableCell>Nama Obat</TableCell>
+                  <TableCell>Satuan</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Katggori</TableCell>
                   <TableCell>Aksi</TableCell>
                 </TableRow>
               </TableHead>
@@ -293,6 +295,8 @@ const deleteData = async(item)=>{
                     <TableRow key={i}>
                       <TableCell>{item.kode_obat}</TableCell>
                       <TableCell>{item.nama_obat}</TableCell>
+                      <TableCell>{item.satuan?.satuan}</TableCell>
+                      <TableCell>{item.kategori.map((kategoriitem, i)=> kategoriitem.nama_kategori ). join(', ')}</TableCell>
                       <TableCell>
                         <Tooltip
                           title={
