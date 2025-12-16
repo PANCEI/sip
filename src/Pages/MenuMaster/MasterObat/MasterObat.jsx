@@ -200,7 +200,7 @@ const deleteData = async(item)=>{
         </CardContent>
       </Card>
 
-      <Box sx={{ width: "50%", position: "relative" }}>
+      <Box sx={{ width: "80%", position: "relative" }}>
         <Paper sx={{ borderRadius: 2, overflow: "hidden", boxShadow: 2 }}>
           {/* Header Table */}
           <Box
@@ -267,8 +267,9 @@ const deleteData = async(item)=>{
                   <TableCell>Kode Obat</TableCell>
                   <TableCell>Nama Obat</TableCell>
                   <TableCell>Satuan</TableCell>
-                  <TableCell>Status</TableCell>
+                  <TableCell>Komposisi</TableCell>
                   <TableCell>Katggori</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Aksi</TableCell>
                 </TableRow>
               </TableHead>
@@ -276,6 +277,15 @@ const deleteData = async(item)=>{
                 {loadingData ? (
                   Array.from({ length: 1 }).map((_, i) => (
                     <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
                       <TableCell>
                         <Skeleton variant="text" />
                       </TableCell>
@@ -296,6 +306,7 @@ const deleteData = async(item)=>{
                       <TableCell>{item.kode_obat}</TableCell>
                       <TableCell>{item.nama_obat}</TableCell>
                       <TableCell>{item.satuan?.satuan}</TableCell>
+                      <TableCell>{item.Kandungan}</TableCell>
                       <TableCell>{item.kategori.map((kategoriitem, i)=> kategoriitem.nama_kategori ). join(', ')}</TableCell>
                       <TableCell>
                         <Tooltip
@@ -324,7 +335,7 @@ const deleteData = async(item)=>{
                               <EditIcon></EditIcon>
                             </IconButton>
                         </Tooltip>
-                        <Tooltip
+                        {/* <Tooltip
                         color="error"
                         aria-label="delete master obat"
                         onClick={()=>deleteData(item.kode_obat)}
@@ -333,7 +344,7 @@ const deleteData = async(item)=>{
                             <DeleteIcon></DeleteIcon>
                           </IconButton>
 
-                        </Tooltip>
+                        </Tooltip> */}
                       </TableCell>
                     </TableRow>
                   ))

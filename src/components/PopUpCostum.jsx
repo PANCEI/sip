@@ -4,7 +4,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: { xs: '90%', sm: 450 },
+    width: { xs: '90%', sm: 900 },
     bgcolor: 'background.paper',
     borderRadius: '12px',
     boxShadow: 24,
