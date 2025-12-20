@@ -28,7 +28,7 @@ export default function MedicineIn() {
       sx={{ 
         p: { xs: 2, md: 4 }, 
         backgroundColor: "#f4f6f8", 
-        minHeight: "80vh",
+        minHeight: "50vh",
         display: "flex",
         justifyContent: "center", // Pusatkan Card secara horizontal
         alignItems: "flex-start"   // Mulai dari atas

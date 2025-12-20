@@ -3,35 +3,74 @@ import { useForm, Controller } from "react-hook-form";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { 
   FormControl, TextField, Box, Select, MenuItem, 
-  InputLabel, Button, Divider, InputAdornment, FormHelperText, Typography, Paper 
+  InputLabel, Button, Divider, InputAdornment, FormHelperText, Typography, Paper ,CircularProgress
 } from "@mui/material";
 import { 
   Save, Medication, Numbers, CalendarToday, 
   Store, Description, Fingerprint, Close 
 } from "@mui/icons-material";
-
+import { Api1 } from "../../../utils/Api1";
 export default function MedicineForm({ onSubmit }) {
   const [user] = useLocalStorageEncrypt("user", null);
+  const [token]=useLocalStorageEncrypt("token", null);
+  const [loading, setLoading] = useState(false);
+  const [kodeObatList, setKodeObatList] = useState([ ]);
   
-  const [kodeObatList] = useState([
-    { id: 1, kode: "OBT001", nama: "Paracetamol" },
-    { id: 2, kode: "OBT002", nama: "Amoxicillin" }
-  ]);
-  
-  const [kodeMitraList] = useState([
-    { id: 1, kode: "MTR001", nama: "Kimia Farma" },
-    { id: 2, kode: "MTR002", nama: "Bio Farma" }
-  ]);
+  const [kodeMitraList, setKodeMitraList] = useState([]);
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
-      kode_obat: "", nama_obat: "", jumlah_masuk: "",
+      kode_obat: "",  jumlah_masuk: "",
       tanggal_masuk: "", tanggal_kadaluarsa: "",
       keterangan: "", kode_mitra: "",
       penerima: user ? user.email : "",
     }
   });
+  useEffect(() => {
+    fetchKodeObat();
+    getKodeMitra();
+  }, [user]);
+const fetchKodeObat = async () => {
+    setLoading(true);
+try{
+  const {data, status} = await Api1('/kode-obat', "GET", {}, { Authorization: `Bearer ${token}` });
+    if(status === 200){
+    console.log("Fetched Kode Obat:", data);
+    setKodeObatList(data.data);
+    setLoading(false);
 
+    }  
+}catch(error){
+    console.error("Error fetching kode obat:", error);
+}
+};
+const getKodeMitra = async () => {
+    setLoading(true);
+    // Fungsi ini bisa diisi jika ingin mengambil data mitra dari API
+    try{
+    const {data, status} = await Api1('/kode-mitra', "GET", {}, { Authorization: `Bearer ${token}` });
+    if(status === 200){
+        console.log("Fetched Kode Mitra:", data);
+        setKodeMitraList(data.data);
+        setLoading(false);
+        // setKodeMitraList(data.data); // Jika ingin menyimpan ke state
+    }
+    }catch(error){
+        console.error("Error fetching kode mitra:", error);
+    }
+  }
+   if (loading) {
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+        </Box>
+      );
+    }
+    // ini agar bisa reset form setelah submit
+    const handleFormSubmit = (data) => {
+        onSubmit(data);
+        reset(); // Reset form setelah submit
+    };
   return (
     <Box sx={{ p: 4, display: "flex", justifyContent: "center"}}>
       <Paper elevation={2} sx={{ width: "100%", p: 5, borderRadius: 1 }}>
@@ -46,7 +85,7 @@ export default function MedicineForm({ onSubmit }) {
           </Typography>
         </Box>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
           
           {/* BARIS 1: INFORMASI UTAMA (FLEXBOX) */}
           <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
@@ -64,8 +103,8 @@ export default function MedicineForm({ onSubmit }) {
                       label="Kode Obat"
                       startAdornment={<InputAdornment position="start"><Fingerprint color="primary" /></InputAdornment>}
                     >
-                      {kodeObatList.map((item) => (
-                        <MenuItem key={item.id} value={item.kode}>{item.kode} - {item.nama}</MenuItem>
+                      {kodeObatList.map((item,i) => (
+                        <MenuItem key={item.i} value={item.kode_obat}>{item.kode_obat} - {item.nama_obat}</MenuItem>
                       ))}
                     </Select>
                   )}
@@ -84,8 +123,8 @@ export default function MedicineForm({ onSubmit }) {
                       label="Mitra"
                       startAdornment={<InputAdornment position="start"><Store color="primary" /></InputAdornment>}
                     >
-                      {kodeMitraList.map((item) => (
-                        <MenuItem key={item.id} value={item.kode}>{item.nama}</MenuItem>
+                      {kodeMitraList.map((item,i) => (
+                        <MenuItem key={item.i} value={item.kode_mitra}>{item.kode_mitra}-{item.nama_mitra}</MenuItem>
                       ))}
                     </Select>
                   )}
