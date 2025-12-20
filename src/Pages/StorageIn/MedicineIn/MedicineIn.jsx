@@ -6,45 +6,65 @@ import {
   Tabs,
   Tab,
   Box,
-  TextField,
-  Button,
-  Grid,
-  InputAdornment,
-  MenuItem,
-  Divider,
 } from "@mui/material";
-import {
-  Inventory,
-  Medication,
-  Numbers,
-  CalendarToday,
-  Save,
-  Category,
-  Store,
-  Assignment,
-} from "@mui/icons-material";
+import { Inventory } from "@mui/icons-material";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import MedicineForm from "./MedicineForm";
+
 export default function MedicineIn() {
   const [activeTab, setActiveTab] = useState(1);
-    const [user] = useLocalStorageEncrypt("user", null);
-    console.log("User Info:", user);
+  const [user] = useLocalStorageEncrypt("user", null);
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-const handleFormSubmit = (data) => {
+
+  const handleFormSubmit = (data) => {
     console.log("Form Data Submitted:", data);
-  }
+  };
+
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f4f6f8", minHeight: "100vh" }}>
-      <Card sx={{ borderRadius: 2, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-        <CardContent sx={{ p: 4 }}>
+    <Box 
+      sx={{ 
+        p: { xs: 2, md: 4 }, 
+        backgroundColor: "#f4f6f8", 
+        minHeight: "80vh",
+        display: "flex",
+        justifyContent: "center", // Pusatkan Card secara horizontal
+        alignItems: "flex-start"   // Mulai dari atas
+      }}
+    >
+      <Card 
+        sx={{ 
+          borderRadius: 3, 
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          width: "100%",
+          maxWidth: "70%", // Membatasi lebar agar tidak terlalu meluas (ruang kosong berkurang)
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2, md: 4 } }}>
           {/* Header */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box sx={{ p: 0.5, backgroundColor: "#1976d2", borderRadius: 1, display: "flex", mr: 2 }}>
-              <Inventory sx={{ color: "#fff", fontSize: 20 }} />
+          <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+            <Box 
+              sx={{ 
+                p: 1, 
+                backgroundColor: "#1976d2", 
+                borderRadius: 1.5, 
+                display: "flex", 
+                mr: 2,
+                boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)"
+              }}
+            >
+              <Inventory sx={{ color: "#fff", fontSize: 24 }} />
             </Box>
-            <Typography variant="h6" fontWeight="bold">Medicine In</Typography>
+            <Box>
+              <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
+                Medicine In
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Manajemen stok masuk gudang farmasi
+              </Typography>
+            </Box>
           </Box>
 
           {/* Tabs */}
@@ -52,29 +72,30 @@ const handleFormSubmit = (data) => {
             value={activeTab}
             onChange={handleTabChange}
             sx={{
-              mb: 4,
+              mb: 3,
               borderBottom: 1,
               borderColor: "divider",
-              "& .MuiTab-root": { fontWeight: "bold", fontSize: "12px" },
+              "& .MuiTab-root": { 
+                fontWeight: "bold", 
+                fontSize: "13px",
+                minWidth: "120px" 
+              },
             }}
           >
-            <Tab label="SHOW DATA" />
-            <Tab label="ADD MEDICINE" />
+            <Tab label="DATA STOK" />
+            <Tab label="TAMBAH OBAT" />
           </Tabs>
 
           {/* Form Content */}
           {activeTab === 1 && (
             <Box 
               sx={{ 
-                display: "flex", 
-                flexDirection: "column",
-                alignItems: "center", // Memastikan seluruh blok form di tengah
                 width: "100%",
-                mt: 2,
-                mb: 5
+                mt: 1,
+                // Hilangkan paksaan alignItems center jika MedicineForm sudah rapi
               }}
             >
-             <MedicineForm onSubmit={handleFormSubmit}/>
+              <MedicineForm onSubmit={handleFormSubmit} />
             </Box>
           )}
         </CardContent>
