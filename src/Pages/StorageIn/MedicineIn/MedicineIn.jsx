@@ -23,14 +23,18 @@ import {
   Store,
   Assignment,
 } from "@mui/icons-material";
-
+import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
+import MedicineForm from "./MedicineForm";
 export default function MedicineIn() {
   const [activeTab, setActiveTab] = useState(1);
-
+    const [user] = useLocalStorageEncrypt("user", null);
+    console.log("User Info:", user);
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
+const handleFormSubmit = (data) => {
+    console.log("Form Data Submitted:", data);
+  }
   return (
     <Box sx={{ p: 3, backgroundColor: "#f4f6f8", minHeight: "100vh" }}>
       <Card sx={{ borderRadius: 2, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
@@ -70,132 +74,7 @@ export default function MedicineIn() {
                 mb: 5
               }}
             >
-              {/* Container Form dengan Lebar Terkunci agar Rapi */}
-              <Box sx={{ width: "100%", maxWidth: "900px" }}> 
-                <Grid container spacing={3} mb={3}>
-                     <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Nama Obat"
-                      placeholder="Input nama obat"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Medication fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                     <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Nama Obat"
-                      placeholder="Input nama obat"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Medication fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-                <Grid container spacing={3}>
-                  {/* Baris 1 */}
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Nama Obat"
-                      placeholder="Input nama obat"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Medication fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      select
-                      label="Kategori"
-                      defaultValue=""
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Category fontSize="small" /></InputAdornment>,
-                      }}
-                    >
-                      <MenuItem value="tablet">Tablet</MenuItem>
-                      <MenuItem value="sirup">Sirup</MenuItem>
-                    </TextField>
-                  </Grid>
-
-                  {/* Baris 2 */}
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      type="number"
-                      label="Jumlah Masuk"
-                      placeholder="#"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Numbers fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Supplier"
-                      placeholder="Nama supplier"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Store fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-
-                  {/* Baris 3 */}
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      type="date"
-                      label="Tanggal Masuk"
-                      InputLabelProps={{ shrink: true }}
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><CalendarToday fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Nomor Batch"
-                      placeholder="Input nomor batch"
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start"><Assignment fontSize="small" /></InputAdornment>,
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-               
-
-                {/* Footer Tombol Simpan */}
-                <Box sx={{ mt: 5, width: "100%" }}>
-                  <Divider sx={{ mb: 3, borderStyle: 'dashed' }} />
-                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
-                    <Button 
-                      variant="outlined" 
-                      sx={{ textTransform: 'none', fontWeight: 'bold', px: 4, borderRadius: 1.5, borderColor: '#dce0e4', color: '#637381' }}
-                    >
-                      Batal
-                    </Button>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<Save />}
-                      sx={{ 
-                        textTransform: 'none', 
-                        fontWeight: 'bold', 
-                        px: 4, 
-                        borderRadius: 1.5,
-                        backgroundColor: '#1976d2'
-                      }}
-                    >
-                      Simpan Data
-                    </Button>
-                  </Box>
-                </Box>
-
-              </Box>
+             <MedicineForm onSubmit={handleFormSubmit}/>
             </Box>
           )}
         </CardContent>
