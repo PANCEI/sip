@@ -22,7 +22,7 @@ export default function MasterMitranForm ({ onSubmit , initialData}){
     });
 
     const getKodeMitra = async () =>{
-        console.log("mendapatkan kode mitra");  
+       // console.log("mendapatkan kode mitra");  
         setLoading(true); // Mulai loading saat memanggil API
         try{
         const {data , status} = await Api1(
@@ -34,7 +34,7 @@ export default function MasterMitranForm ({ onSubmit , initialData}){
         
         
         if (status === 200) {
-            console.log("Kode Mitra Hasil API:", data);
+         //   console.log("Kode Mitra Hasil API:", data);
             // Perbaikan 2: Isi field kode_mitra setelah berhasil mendapatkan data
             reset(prev => ({ 
                 ...prev, 
@@ -53,7 +53,7 @@ export default function MasterMitranForm ({ onSubmit , initialData}){
     useEffect(()=>{
         const fetchData= async ()=>{
             if(initialData){
-                console.log("Mode Edit - Mengisi form dengan data awal:", initialData);
+               // console.log("Mode Edit - Mengisi form dengan data awal:", initialData);
                 // Perbaikan 3: Mode Edit - Reset dengan data yang ada
                 reset({
                     kode_mitra:initialData.kode_mitra || "",

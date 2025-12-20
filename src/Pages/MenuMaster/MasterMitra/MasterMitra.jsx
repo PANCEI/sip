@@ -93,7 +93,7 @@ export default function MasterMitra() {
             fetchAllMitra();
         }
         }
-      console.log("Response from API:", data);
+      
     }catch(error){
         console.error("Error submitting data:", error);
     }finally{
@@ -111,7 +111,7 @@ export default function MasterMitra() {
     setPage(0);
   };
   const handleToggleStatus = async (item) => {
-    console.log("Toggled status for item:", item);
+  //  console.log("Toggled status for item:", item);
     setLoadingData(true);
     try{
       const newStatus = item.flag_delete === 1 ? 0 : 1;
@@ -132,7 +132,7 @@ export default function MasterMitra() {
             : mitra
         )
       );
-      console.log("Response from API:", data);
+     
       }
 
     }catch(error){
@@ -143,7 +143,7 @@ export default function MasterMitra() {
   }
     // untuk edit data masster obat
   const handleEdit =(item) =>{
-    console.log(item);
+  //  console.log(item);
     setEditData (item);
     handleOpen();
 
