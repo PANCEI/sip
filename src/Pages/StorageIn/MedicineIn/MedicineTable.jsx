@@ -11,6 +11,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete"; 
 import InputAdornment from '@mui/material/InputAdornment';
 import { alertConfirmation } from "../../../components/alertConfirmation";
+import { Toast } from "../../../components/Toast";
 export default function MadicineTable() {
   const [token] = useLocalStorageEncrypt('token', null);
   const {confirm} = alertConfirmation();
@@ -20,6 +21,7 @@ export default function MadicineTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalData, setTotalData] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const ToastShow = Toast();
   const GetdataMedicineIn = useCallback(async () => {
     setLoadingData(true);
     try {
@@ -40,23 +42,39 @@ export default function MadicineTable() {
   }, [token, page, rowsPerPage, searchTerm]);
 
   // Fungsi Hapus (Silahkan pasang hook custom Anda di sini)
-  const handleDelete = async (form) => {
-    const confirmDelete = await confirm({
-      text:"Yakin ? Anda Akan Mengurangi Stok Obat Ini",  
-    });
-    if (confirmDelete) {
-      try {
-        const { status } = await Api1(`/delete-medicine-in`, "DELETE",  form , { 
-          Authorization: `Bearer ${token}` 
-        });
-        if (status === 200) {
-          GetdataMedicineIn(); // Refresh data setelah hapus
-        }
-      } catch (error) {
-        console.error("Gagal menghapus data", error);
+const handleDelete = async (form) => {
+  const confirmDelete = await confirm({
+    text: "Yakin? Anda Akan Mengurangi Stok Obat Ini",
+  });
+
+  if (confirmDelete) {
+    try {
+      // Panggil API
+      const result = await Api1(`/delete-medicine-in`, "DELETE", form, {
+        Authorization: `Bearer ${token}`,
+      });
+
+      // Karena helper Api1 melakukan 'return' saat error, 
+      // kita cek statusnya secara manual di sini, bukan di catch.
+      
+      if (result.status === 200) {
+        ToastShow("success", result.data?.message || "Berhasil menghapus data");
+        GetdataMedicineIn();
+      } else {
+        // DI SINI tempat menangkap status 422, 404, dll.
+        // Helper Anda menaruh JSON Laravel di dalam properti 'error'
+        const serverMsg = result.error?.message || result.error?.data || "Gagal menghapus data";
+        
+        console.error("Gagal dari Server:", result);
+        ToastShow("error", serverMsg);
       }
+    } catch (err) {
+      // Catch ini hanya akan jalan jika ada error fatal di level JS (misal typo kode)
+      console.error("Fatal Error:", err);
+      ToastShow("error", "Terjadi kesalahan sistem");
     }
-  };
+  }
+};
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
