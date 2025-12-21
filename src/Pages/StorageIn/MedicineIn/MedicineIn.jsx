@@ -10,6 +10,7 @@ import {
 import { Inventory } from "@mui/icons-material";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import MedicineForm from "./MedicineForm";
+import MadicineTable from "./MedicineTable";
 //import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
 export default function MedicineIn() {
@@ -69,7 +70,7 @@ export default function MedicineIn() {
             </Box>
             <Box>
               <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
-                Medicine In
+                Obat Masuk
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 Manajemen stok masuk gudang farmasi
@@ -92,12 +93,12 @@ export default function MedicineIn() {
               },
             }}
           >
-            <Tab label="DATA STOK" />
+            <Tab label="DATA OBAT MASUK" />
             <Tab label="TAMBAH OBAT" />
           </Tabs>
 
           {/* Form Content */}
-          {activeTab === 1 && (
+          {activeTab === 1 ? (
             <Box 
               sx={{ 
                 width: "100%",
@@ -107,6 +108,8 @@ export default function MedicineIn() {
             >
               <MedicineForm onSubmit={handleFormSubmit} />
             </Box>
+          ):(
+            <MadicineTable/>
           )}
         </CardContent>
       </Card>
