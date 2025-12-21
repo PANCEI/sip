@@ -59,7 +59,7 @@ export default function MedicineForm({ onSubmit }) {
 
   const handleFormSubmit = (data) => {
     onSubmit(data);
-    reset();
+   reset();
   };
 
   if (loading) {

@@ -10,17 +10,27 @@ import {
 import { Inventory } from "@mui/icons-material";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import MedicineForm from "./MedicineForm";
-
+//import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
+import { Api1 } from "../../../utils/Api1";
 export default function MedicineIn() {
   const [activeTab, setActiveTab] = useState(1);
-  const [user] = useLocalStorageEncrypt("user", null);
+  const [token] = useLocalStorageEncrypt("token", null);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  const handleFormSubmit = (data) => {
-    console.log("Form Data Submitted:", data);
+  const handleFormSubmit = (form) => {
+    console.log("Form Data Submitted:", form);
+    try{
+      const {data , status} = Api1('/add-medicine-in', "POST", form, { Authorization: `Bearer ${token}` });
+      if(status === 200){
+
+        console.log("Data successfully submitted:", data);
+      }
+    }catch(error){
+      console.error("Error submitting form data:", error);
+    }
   };
 
   return (
