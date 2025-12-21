@@ -28,6 +28,7 @@ import { Api1 } from "../../../utils/Api1";
 import EditIcon from '@mui/icons-material/Edit';
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { useEffect } from "react";
+import { Toast } from "../../../components/Toast";
 export default function MasterMitra() {
     const [loadngData ,setLoadingData] = useState(false);
     const [open , setOpen] = useState(false);
@@ -37,6 +38,7 @@ export default function MasterMitra() {
     const [pencarian, setPencarian] = useState ("");
     const [rowsPerPage, setRowsPerPage] = useState (10);
     const [page, setPage] = useState (0);
+    const ShowToast = Toast();
      const handleOpen = () => setOpen(true);
     const handleClose = () => {
         setOpen(false);
@@ -81,6 +83,7 @@ export default function MasterMitra() {
           );
           if (status === 200){
             fetchAllMitra();
+            ShowToast("success", "Data Mitra Berhasil Ditambahkan");
         }
         }else{
           const {data, status} = await Api1(
@@ -91,6 +94,7 @@ export default function MasterMitra() {
           );
           if (status === 200){
             fetchAllMitra();
+            ShowToast("success", "Data Mitra Berhasil Diupdate");
         }
         }
       
@@ -125,12 +129,14 @@ export default function MasterMitra() {
         {Authorization: `Bearer ${token}`}
       );
       if (status === 200){
+         showToast("success", data.data);
       setMasterMitra((prevMitra) =>
         prevMitra.map((mitra) =>
           mitra.kode_mitra === item.kode_mitra
             ? { ...mitra, flag_delete: newStatus }
             : mitra
         )
+        
       );
      
       }

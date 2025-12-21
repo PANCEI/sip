@@ -11,12 +11,13 @@ import { Inventory } from "@mui/icons-material";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import MedicineForm from "./MedicineForm";
 import MadicineTable from "./MedicineTable";
+import { Toast } from "../../../components/Toast";
 //import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
 export default function MedicineIn() {
   const [activeTab, setActiveTab] = useState(1);
   const [token] = useLocalStorageEncrypt("token", null);
-
+  const ShowToast= Toast();
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
@@ -26,7 +27,7 @@ export default function MedicineIn() {
     try{
       const {data , status} = Api1('/add-medicine-in', "POST", form, { Authorization: `Bearer ${token}` });
       if(status === 200){
-
+         ShowToast("success", "Data berhasil disimpan");
         console.log("Data successfully submitted:", data);
       }
     }catch(error){
