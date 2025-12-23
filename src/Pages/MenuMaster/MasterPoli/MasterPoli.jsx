@@ -18,7 +18,16 @@ import { Card,
 import AddIcon from "@mui/icons-material/Add";
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from "@mui/icons-material/Search";
+import { useState , useEffect } from "react";
+import PopUpCostum from "../../../components/PopUpCostum";
+import MasterPoliForm from "./MasterPoliForm";
 export default function MasterPoli() {
+  const [loading, setLoading] = useState(false);
+const [openModal, setOpenModal] = useState(false);
+const [editData, setEditData] = useState(null);
+const handleformSuobmit = (data) => {
+
+}
   return (
   <>
  <Box sx={{p:3 , bgcolor:"grey.100", minHeight:"70vh" , zIndex:1}}>
@@ -52,7 +61,10 @@ export default function MasterPoli() {
                 startIcon={<AddIcon />}
                 sx={{ borderRadius: "12px", fontWeight: "bold" }}
                 sixe="small"
-                
+                 onClick={() => {
+                setEditData(null);
+                setOpenModal(true);
+              }}
                 >
                     Tambah Poli
                 </Button>
@@ -95,11 +107,47 @@ export default function MasterPoli() {
                         <TableCell>Aksi</TableCell>
                     </TableRow>
                 </TableHead>
+                <TableBody>
+                  {
+                    loading?(
+                      array.from(new Array(1)).map((_, index)=>(
+                        <TableRow key={index}>
+                           <TableCell><Skeleton variant="text" /></TableCell>
+                           <TableCell><Skeleton variant="text" /></TableCell>
+                           <TableCell><Skeleton variant="text" /></TableCell>
+                           <TableCell><Skeleton variant="text" /></TableCell>
+
+                        </TableRow>
+                      ))
+                    ):(
+                      <TableRow>
+                      <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          Tidak ada data yang ditemukan.
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    )
+                  }
+                </TableBody>
             </Table>
         </TableContainer>
         </Paper>
         </Box>
   </Box>
+<PopUpCostum
+        open={openModal}
+        handleClose={() => 
+         { 
+          setOpenModal(false)
+          setEditData(null);
+        }} 
+        title="Form Poli"
+      
+      >
+        <MasterPoliForm onSubmit={handleformSuobmit} initialData={editData}/>
+        {/* Konten form dapat ditambahkan di sini */}
+      </PopUpCostum>
   </>
   );
 }
