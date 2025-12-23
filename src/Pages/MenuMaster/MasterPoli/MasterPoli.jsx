@@ -14,7 +14,9 @@ import { Card,
   Skeleton,
   Tooltip,
   IconButton,
-  TablePagination, } from "@mui/material";
+  TablePagination, 
+  Switch,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from "@mui/icons-material/Search";
@@ -29,7 +31,7 @@ export default function MasterPoli() {
 const [openModal, setOpenModal] = useState(false);
 const [editData, setEditData] = useState(null);
 const [token] = useLocalStorageEncrypt("token", null);
-
+const [dataPoli, setDataPoli] = useState([]);
 const fetchDataPoli = async () => {
   setLoading(true);
 try{
@@ -38,6 +40,7 @@ try{
   });
   if(status === 200){
     console.log("data poli:", data);
+    setDataPoli(data.data);
   }
 }catch(error){
   console.log("error fetch data poli", error);
@@ -156,7 +159,30 @@ const handleformSuobmit = async (form) => {
 
                         </TableRow>
                       ))
-                    ):(
+                    ):dataPoli.length > 0 ? (
+                      dataPoli.map((item , index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.kode_poli}</TableCell>
+                          <TableCell>{item.nama_poli}</TableCell>
+                          <TableCell>{item.deskripsi}</TableCell>
+                          <TableCell>
+                            <Tooltip
+                              title={
+                            item.is_active === 1
+                              ? "Klik untuk mengaktifkan"
+                              : "Klik untuk menonaktifkan"
+                          }
+                            >
+                               <Switch
+                            checked={item.is_active === 0}
+                           
+                            color={item.is_active === 1 ? "error" : "success"}
+                          />
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ): (
                       <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
