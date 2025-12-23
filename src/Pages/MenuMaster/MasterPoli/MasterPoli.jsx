@@ -21,12 +21,28 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useState , useEffect } from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
 import MasterPoliForm from "./MasterPoliForm";
+import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
+import { Api1 } from "../../../utils/Api1";
 export default function MasterPoli() {
   const [loading, setLoading] = useState(false);
 const [openModal, setOpenModal] = useState(false);
 const [editData, setEditData] = useState(null);
-const handleformSuobmit = (data) => {
+const [token] = useLocalStorageEncrypt("token", null);
 
+const handleformSuobmit = async (form) => {
+      console.log("data dari form poli:", form);
+      if (form.id) {
+      console.log("edit data poli", form);
+      }else{
+      const {data , status} = await Api1('/add-master-poli', 'POST', form, {
+        Authorization: `Bearer ${token}`,
+      });
+      if(status === 200){
+        console.log("sukses menambah poli", data);
+        setOpenModal(false);
+        // refresh data poli  
+      }
+    }
 }
   return (
   <>
