@@ -23,12 +23,31 @@ import PopUpCostum from "../../../components/PopUpCostum";
 import MasterPoliForm from "./MasterPoliForm";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
+
 export default function MasterPoli() {
   const [loading, setLoading] = useState(false);
 const [openModal, setOpenModal] = useState(false);
 const [editData, setEditData] = useState(null);
 const [token] = useLocalStorageEncrypt("token", null);
 
+const fetchDataPoli = async () => {
+  setLoading(true);
+try{
+  const {data , status} = await Api1('/all-master-poli', 'GET', {}, {
+    Authorization: `Bearer ${token}`,
+  });
+  if(status === 200){
+    console.log("data poli:", data);
+  }
+}catch(error){
+  console.log("error fetch data poli", error);
+}finally{
+  setLoading(false);
+}
+};
+useEffect(() => {
+  fetchDataPoli();
+}, []);
 const handleformSuobmit = async (form) => {
       console.log("data dari form poli:", form);
       if (form.id) {
@@ -120,14 +139,16 @@ const handleformSuobmit = async (form) => {
                         <TableCell>Kode Poli</TableCell>
                         <TableCell>Nama</TableCell>
                         <TableCell>Deskripsi</TableCell>
+                        <TableCell>active</TableCell>
                         <TableCell>Aksi</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                   {
                     loading?(
-                      array.from(new Array(1)).map((_, index)=>(
-                        <TableRow key={index}>
+                      Array.from({ length: 1 }).map((_, i) => (
+                        <TableRow key={i}>
+                           <TableCell><Skeleton variant="text" /></TableCell>
                            <TableCell><Skeleton variant="text" /></TableCell>
                            <TableCell><Skeleton variant="text" /></TableCell>
                            <TableCell><Skeleton variant="text" /></TableCell>
@@ -137,7 +158,7 @@ const handleformSuobmit = async (form) => {
                       ))
                     ):(
                       <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                      <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
                           Tidak ada data yang ditemukan.
                         </Typography>
