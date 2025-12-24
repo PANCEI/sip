@@ -19,6 +19,7 @@ import SatuanObat from "./Pages/MenuMaster/SatuanObat/SatuanObat";
 import MasterMitra from "./Pages/MenuMaster/MasterMitra/MasterMitra";
 import MedicineIn from "./Pages/StorageIn/MedicineIn/MedicineIn";
 import MasterPoli from "./Pages/MenuMaster/MasterPoli/MasterPoli";
+import MasterDokter from "./Pages/MenuMaster/MasterDokter/MasterDokter";
 // import { useLocalStorageEncrypt } from "./helper/CostumHook";
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
     mastermitra:<MasterMitra/>,
     medicinein:<MedicineIn/>,
     masterpoli:<MasterPoli/>,
+    masterdokter:<MasterDokter/>,
   };
 
   if (isLoading) {
