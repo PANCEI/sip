@@ -20,12 +20,13 @@ import { Card,
 import AddIcon from "@mui/icons-material/Add";
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from "@mui/icons-material/Search";
-import { useState , useEffect } from "react";
+import { useState , useEffect , useMemo} from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
 import MasterPoliForm from "./MasterPoliForm";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
 import EditIcon from '@mui/icons-material/Edit';
+
 export default function MasterPoli() {
   const [loading, setLoading] = useState(false);
 const [openModal, setOpenModal] = useState(false);
@@ -74,13 +75,41 @@ const handleformSuobmit = async (form) => {
       }
     }
 }
+// Filter data berdasarkan input pencarian
+  const filteredData = useMemo(() => {
+    return dataPoli.filter((item) => {
+      const searchLower = pencarian.toLowerCase();
+      return (
+        item.nama_poli?.toLowerCase().includes(searchLower) ||
+        item.kode_poli?.toLowerCase().includes(searchLower) ||
+        item.deskripsi?.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [pencarian, dataPoli]);
+  const ubahStatus = async (item)=>{
+    console.log('ubah status', item);
+    try{
+      const statusBaru = item.is_active === 1 ? 0:1;
+const {data , status} = await Api1('/ubah-active-poli','PUT',{
+  id:item.id,
+  is_active:statusBaru
+}, {Authorization: `Bearer ${token}`})
+  if(status === 200  && data.message === 'berhasil'){
+    console.log('ubah status berhasil', data.message);
+  }
+    }catch(error){
+      console.log('data melakukan update active', error);
+    }finally{
+
+    }
+  }
   return (
   <>
  <Box sx={{p:3 , bgcolor:"grey.100", minHeight:"70vh" , zIndex:1}}>
 <Card sx={{mb:3, borderRadius:"12px", boxShadow:"0 4px 12px rgba(0,0,0,0.05)"}}>
          <CardContent>
             <Typography variant="h5" fontWeight="bold" color="text.primary">
-              Master Kategori Obat
+              Master Poli
             </Typography>
           </CardContent>
         </Card>
@@ -118,7 +147,8 @@ const handleformSuobmit = async (form) => {
                 size="small"
                 variant="outlined"
                 label="Cari Poli"
-             
+             value={pencarian}
+                onChange={(e) => setPencarian(e.target.value)}
                 slotProps={{
                     input: {
                     startAdornment: (
@@ -167,8 +197,8 @@ const handleformSuobmit = async (form) => {
 
                         </TableRow>
                       ))
-                    ):dataPoli.length > 0 ? (
-                      dataPoli.map((item , index) => (
+                    ):filteredData.length > 0 ? (
+                      filteredData.map((item , index) => (
                         <TableRow key={index}>
                           <TableCell>{item.kode_poli}</TableCell>
                           <TableCell>{item.nama_poli}</TableCell>
@@ -183,7 +213,9 @@ const handleformSuobmit = async (form) => {
                             >
                                <Switch
                             checked={item.is_active === 0}
-                           
+                           onChange={()=> {
+                            ubahStatus(item)
+                           }}
                             color={item.is_active === 1 ? "error" : "success"}
                           />
                             </Tooltip>
