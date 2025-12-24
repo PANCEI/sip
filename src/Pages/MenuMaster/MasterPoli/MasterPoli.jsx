@@ -26,7 +26,7 @@ import MasterPoliForm from "./MasterPoliForm";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
 import EditIcon from '@mui/icons-material/Edit';
-
+import { Toast } from "../../../components/Toast";
 export default function MasterPoli() {
   const [loading, setLoading] = useState(false);
 const [openModal, setOpenModal] = useState(false);
@@ -34,6 +34,7 @@ const [editData, setEditData] = useState(null);
 const [token] = useLocalStorageEncrypt("token", null);
 const[pencarian , setPencarian] = useState('');
 const [dataPoli, setDataPoli] = useState([]);
+ const ShowToast = Toast();
 const fetchDataPoli = async () => {
   setLoading(true);
 try{
@@ -61,6 +62,7 @@ const handleformSuobmit = async (form) => {
       const {data , status} = await Api1('/edit-master-poli' , 'PUT', form,{  Authorization: `Bearer ${token}`,
       });
       if(status === 200){
+         ShowToast("success", "Data Poli berhasil Di Ubah");
         console.log(data);
         fetchDataPoli();
       }
@@ -70,6 +72,7 @@ const handleformSuobmit = async (form) => {
       });
       if(status === 200){
         console.log("sukses menambah poli", data);
+         ShowToast("success", "Data Poli berhasil Di Tambahkan");
         fetchDataPoli();
         // refresh data poli  
       }
@@ -106,6 +109,9 @@ const ubahStatus = async (item) => {
           poli.id === item.id ? { ...poli, is_active: statusBaru } : poli
         );
       });
+       ShowToast("success", "Status Data Poli Berhasil Di Ubah");
+    }else{
+       ShowToast("error", "Data Poli gagal di update");
     }
   } catch (error) {
     console.log('gagal melakukan update active', error);
