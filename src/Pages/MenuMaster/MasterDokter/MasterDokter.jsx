@@ -19,8 +19,11 @@ import AddIcon from "@mui/icons-material/Add";
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from "@mui/icons-material/Search";
 import { useState, useEffect } from "react";
+import PopUpCostum from "../../../components/PopUpCostum";
 export default function MasterDokter() {
 const [loading , setLoading] = useState(false);
+const [open , setOpen] = useState(false);
+const [editData, setEditData] = useState([]);
   return (
   <>
     <Box sx={{p:3, bgcolor:"grey.100" , minHeight:"70vh", zIndex:1}}>
@@ -51,6 +54,9 @@ const [loading , setLoading] = useState(false);
                 startIcon={<AddIcon />}
                 sx={{ borderRadius: "12px", fontWeight: "bold" }}
                 sixe="small"
+                onClick={()=>{
+                    setOpen(true);
+                }}
             >
                 Tambah Master Dokter
             </Button>
@@ -128,6 +134,16 @@ const [loading , setLoading] = useState(false);
     </Paper>
     </Box>
   </Box>
+  <PopUpCostum
+  open={open}
+  handleClose={()=>{
+    setOpen(false);
+    setEditData(null);
+  }}
+  title={editData? "Edit Master Dokter" :"Tambah Master Dokter"}
+  >
+
+  </PopUpCostum>
   </>
   );
 }

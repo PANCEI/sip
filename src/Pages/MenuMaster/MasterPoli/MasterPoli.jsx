@@ -274,9 +274,9 @@ const ubahStatus = async (item) => {
           setEditData(null);
         }} 
         title={setEditData ? "Edit Master Poli" :"Tambah Master Poli"}
-      
+      children={<MasterPoliForm onSubmit={handleformSuobmit} initialData={editData}/>}
       >
-        <MasterPoliForm onSubmit={handleformSuobmit} initialData={editData}/>
+        {/* <MasterPoliForm onSubmit={handleformSuobmit} initialData={editData}/> */}
         {/* Konten form dapat ditambahkan di sini */}
       </PopUpCostum>
   </>
