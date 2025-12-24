@@ -86,23 +86,31 @@ const handleformSuobmit = async (form) => {
       );
     });
   }, [pencarian, dataPoli]);
-  const ubahStatus = async (item)=>{
-    console.log('ubah status', item);
-    try{
-      const statusBaru = item.is_active === 1 ? 0:1;
-const {data , status} = await Api1('/ubah-active-poli','PUT',{
-  id:item.id,
-  is_active:statusBaru
-}, {Authorization: `Bearer ${token}`})
-  if(status === 200  && data.message === 'berhasil'){
-    console.log('ubah status berhasil', data.message);
-  }
-    }catch(error){
-      console.log('data melakukan update active', error);
-    }finally{
+const ubahStatus = async (item) => {
+  console.log('ubah status', item);
+  try {
+    const statusBaru = item.is_active === 1 ? 0 : 1;
+    const { data, status } = await Api1('/ubah-active-poli', 'PUT', {
+      id: item.id,
+      is_active: statusBaru
+    }, { Authorization: `Bearer ${token}` });
 
+    if (status === 200 && data.message === 'berhasil') {
+      console.log('ubah status berhasil');
+      
+     
+      setDataPoli((prev) => {
+        // Map harus me-return array baru
+        return prev.map((poli) =>
+         
+          poli.id === item.id ? { ...poli, is_active: statusBaru } : poli
+        );
+      });
     }
+  } catch (error) {
+    console.log('gagal melakukan update active', error);
   }
+};
   return (
   <>
  <Box sx={{p:3 , bgcolor:"grey.100", minHeight:"70vh" , zIndex:1}}>
