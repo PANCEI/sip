@@ -21,12 +21,30 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useState, useEffect } from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
 import MasterDokterForm from "./MasterDokterForm";
+import { Api1 } from "../../../utils/Api1";
+import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 export default function MasterDokter() {
 const [loading , setLoading] = useState(false);
 const [open , setOpen] = useState(false);
 const [editData, setEditData] = useState([]);
+const [token] = useLocalStorageEncrypt('token', null);
 const handleSubmit= async (form)=>{
     console.log(form);
+    try{
+        if(form.id){
+            console.log('update data ');
+        }else{
+            console.log('manambah data')
+            const {data, status } = await Api1('/add-master-dokter', 'POST', form,{
+                Authorization: `Bearer ${token}`
+            })
+            console.log(data);
+        }
+    }catch(err){
+        console.log('gagal dari api', err);
+    }finally{
+
+    }
 }
   return (
   <>
