@@ -140,6 +140,7 @@ const handleDelete = async (form) => {
                 <TableCell>Nama Obat</TableCell>
                 <TableCell>Supplier</TableCell>
                 <TableCell>Jumlah</TableCell>
+                <TableCell>Tanggal Masuk</TableCell>
                 <TableCell>Kadaluarsa</TableCell>
                 <TableCell>Petugas</TableCell>
                 <TableCell>Keterangan</TableCell>
@@ -150,7 +151,7 @@ const handleDelete = async (form) => {
               {loadingData ? (
                 Array.from({ length: rowsPerPage }).map((_, index) => (
                   <TableRow key={index}>
-                    {Array.from({ length: 8 }).map((_, i) => (
+                    {Array.from({ length: 9 }).map((_, i) => (
                       <TableCell key={i}><Skeleton variant="text" /></TableCell>
                     ))}
                   </TableRow>
@@ -162,7 +163,16 @@ const handleDelete = async (form) => {
                     <TableCell>{row.nama_obat}</TableCell>
                     <TableCell>{row.nama_mitra}</TableCell>
                     <TableCell>{row.jumlah_masuk}</TableCell>
-                    <TableCell>{row.tanggal_kadaluarsa}</TableCell>
+                    <TableCell>
+          {row.tanggal_masuk 
+            ? new Date(row.tanggal_masuk).toLocaleDateString('id-ID').replace(/\//g, '-') 
+            : '-'}
+        </TableCell>
+                    <TableCell>
+          {row.tanggal_kadaluarsa 
+            ? new Date(row.tanggal_kadaluarsa).toLocaleDateString('id-ID').replace(/\//g, '-') 
+            : '-'}
+        </TableCell>
                     <TableCell>{row.petugas}</TableCell>
                     <TableCell>{row.keterangan}</TableCell>
                     <TableCell align="center">
