@@ -20,10 +20,14 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from "@mui/icons-material/Search";
 import { useState, useEffect } from "react";
 import PopUpCostum from "../../../components/PopUpCostum";
+import MasterDokterForm from "./MasterDokterForm";
 export default function MasterDokter() {
 const [loading , setLoading] = useState(false);
 const [open , setOpen] = useState(false);
 const [editData, setEditData] = useState([]);
+const handleSubmit= async (form)=>{
+    console.log(form);
+}
   return (
   <>
     <Box sx={{p:3, bgcolor:"grey.100" , minHeight:"70vh", zIndex:1}}>
@@ -141,6 +145,7 @@ const [editData, setEditData] = useState([]);
     setEditData(null);
   }}
   title={editData? "Edit Master Dokter" :"Tambah Master Dokter"}
+children={<MasterDokterForm onSubmit={handleSubmit} initialData={editData} />}
   >
 
   </PopUpCostum>
