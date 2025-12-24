@@ -231,6 +231,20 @@ if (loading) {
         )}
         />
     </FormControl>
+    <button
+          type="submit"
+          style={{
+            background: "#1976d2",
+            color: "white",
+            padding: "10px 16px",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          {initialData ? "Update" :"Tambah Dokter"}
+        </button>
+          {console.log(initialData)}
     </Stack>
     </form>
     </>
