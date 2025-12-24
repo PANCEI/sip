@@ -13,7 +13,7 @@ import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 
 export default function MasterPoliForm({ onSubmit, initialData }) {
     const [token] = useLocalStorageEncrypt("token", null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const {
         control,
         handleSubmit,
@@ -58,6 +58,7 @@ export default function MasterPoliForm({ onSubmit, initialData }) {
     }, [initialData]);
 
     const getDataKodePoli = async () => {
+        setLoading(true);
         try {
             const { data, status } = await Api1(
                 "/generate-code-poli",

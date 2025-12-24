@@ -129,7 +129,7 @@ export default function MasterMitra() {
         {Authorization: `Bearer ${token}`}
       );
       if (status === 200){
-         showToast("success", data.data);
+         ShowToast("success", 'berhasil ubah status');
       setMasterMitra((prevMitra) =>
         prevMitra.map((mitra) =>
           mitra.kode_mitra === item.kode_mitra

@@ -25,12 +25,13 @@ import PopUpCostum from "../../../components/PopUpCostum";
 import MasterPoliForm from "./MasterPoliForm";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import { Api1 } from "../../../utils/Api1";
-
+import EditIcon from '@mui/icons-material/Edit';
 export default function MasterPoli() {
   const [loading, setLoading] = useState(false);
 const [openModal, setOpenModal] = useState(false);
 const [editData, setEditData] = useState(null);
 const [token] = useLocalStorageEncrypt("token", null);
+const[pencarian , setPencarian] = useState('');
 const [dataPoli, setDataPoli] = useState([]);
 const fetchDataPoli = async () => {
   setLoading(true);
@@ -53,15 +54,22 @@ useEffect(() => {
 }, []);
 const handleformSuobmit = async (form) => {
       console.log("data dari form poli:", form);
+              setOpenModal(false);
       if (form.id) {
       console.log("edit data poli", form);
+      const {data , status} = await Api1('/edit-master-poli' , 'PUT', form,{  Authorization: `Bearer ${token}`,
+      });
+      if(status === 200){
+        console.log(data);
+        fetchDataPoli();
+      }
       }else{
       const {data , status} = await Api1('/add-master-poli', 'POST', form, {
         Authorization: `Bearer ${token}`,
       });
       if(status === 200){
         console.log("sukses menambah poli", data);
-        setOpenModal(false);
+        fetchDataPoli();
         // refresh data poli  
       }
     }
@@ -180,6 +188,20 @@ const handleformSuobmit = async (form) => {
                           />
                             </Tooltip>
                           </TableCell>
+                          <TableCell>
+                              <Tooltip
+                        color="primary"
+                        aria-label="Edit Master Poli"
+                       onClick={()=>{
+                        setEditData(item);
+                        setOpenModal(true);
+                       }}
+                        >
+                            <IconButton>
+                              <EditIcon></EditIcon>
+                            </IconButton>
+                        </Tooltip>
+                          </TableCell>
                         </TableRow>
                       ))
                     ): (
@@ -205,7 +227,7 @@ const handleformSuobmit = async (form) => {
           setOpenModal(false)
           setEditData(null);
         }} 
-        title="Form Poli"
+        title={setEditData ? "Edit Master Poli" :"Tambah Master Poli"}
       
       >
         <MasterPoliForm onSubmit={handleformSuobmit} initialData={editData}/>
