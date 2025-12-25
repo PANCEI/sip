@@ -27,7 +27,9 @@ import MasterDokterForm from "./MasterDokterForm";
 import { Api1 } from "../../../utils/Api1";
 import { useLocalStorageEncrypt } from "../../../helper/CostumHook";
 import EditIcon from '@mui/icons-material/Edit';
+import { Toast } from "../../../components/Toast";
 export default function MasterDokter() {
+    const showToast = Toast();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState([]);
@@ -45,7 +47,7 @@ export default function MasterDokter() {
   };
   const handleSubmit = async (form) => {
     setOpen(false);
-    console.log(form);
+    //console.log(form);
     try {
       if (form.id) {
         console.log('update data ');
@@ -54,6 +56,7 @@ export default function MasterDokter() {
         })
         console.log(data);
         if(status === 200  && data.message === 'berhasil'){
+            showToast("success", 'Master Dokter Berhasil Di Edit'); 
           getAllDokter();
         }
       } else {
@@ -63,6 +66,7 @@ export default function MasterDokter() {
         })
         if(status === 200 && data.message ==='berhasil'){
           getAllDokter();
+            showToast("success", 'Master Dokter Berhasil Di tambahkan'); 
         }
         console.log(data);
       }
@@ -78,7 +82,7 @@ export default function MasterDokter() {
       const { data, status } = await Api1('/get-all-dokter', 'GET', {}, {
         Authorization: `Bearer ${token}`
       })
-      console.log(data)
+  
       if (status === 200 && data.message === 'berhasil') {
         setDokter(data.data);
       }
@@ -94,8 +98,31 @@ export default function MasterDokter() {
   const filtered = dokter.filter((item) =>
     item.nama_dokter?.toLowerCase().includes(pencarian.toLowerCase())
   );
-  const handleToggleStatus = async () => {
-
+  const handleToggleStatus = async (item) => {
+    try{
+      const statusBaru = item.flag_delete === 1? 0:1;
+      const {data , status }= await Api1(
+        '/ubah-status-dokter',
+        'PATCH',
+        {
+          flag_delete:statusBaru,
+          id:item.id
+        },
+         { Authorization: `Bearer ${token}` }
+      );
+      if(status === 200){
+        console.log('ubah status ', data);
+        setDokter((prev)=>
+        prev.map((dokter)=>
+        dokter.id === item.id ? {...dokter, flag_delete:statusBaru}:dokter
+        )
+        
+        );
+        showToast("success", 'status berhasil di ubah'); 
+      }
+    }catch(error){
+      console.log('gagal dari api', error);
+    }
   }
   return (
     <>
@@ -138,7 +165,7 @@ export default function MasterDokter() {
                 size="small"
                 variant="outlined"
                 label="Cari Dokter"
-
+                onChange={(e)=>setPencarian(e.target.value)}
                 slotProps={{
                   input: {
                     startAdornment: (
