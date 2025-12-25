@@ -44,15 +44,26 @@ export default function MasterDokter() {
     setPage(0);
   };
   const handleSubmit = async (form) => {
+    setOpen(false);
     console.log(form);
     try {
       if (form.id) {
         console.log('update data ');
+        const {data , status} = await Api1('/edit-master-dokter', 'PUT', form, {
+          Authorization: `Bearer ${token}`
+        })
+        console.log(data);
+        if(status === 200  && data.message === 'berhasil'){
+          getAllDokter();
+        }
       } else {
         console.log('manambah data')
         const { data, status } = await Api1('/add-master-dokter', 'POST', form, {
           Authorization: `Bearer ${token}`
         })
+        if(status === 200 && data.message ==='berhasil'){
+          getAllDokter();
+        }
         console.log(data);
       }
     } catch (err) {
@@ -62,6 +73,7 @@ export default function MasterDokter() {
     }
   }
   const getAllDokter = async () => {
+    setLoading(true);
     try {
       const { data, status } = await Api1('/get-all-dokter', 'GET', {}, {
         Authorization: `Bearer ${token}`
@@ -73,7 +85,7 @@ export default function MasterDokter() {
     } catch (error) {
       console.log('api gagal', error);
     } finally {
-
+      setLoading(false);
     }
   }
   useEffect(() => {
