@@ -20,10 +20,9 @@ export default function FormPasien({ onSubmit, loading }) {
     defaultValues: {
       no_rm: "",
       nama_pasien: "",
-      alamat: "",
-      jenis_kelamin: "",
       tgl_lahir: "",
-      telepon: "",
+      alamat: "",
+      deskripsi: "",
     }
   });
 
@@ -172,14 +171,14 @@ export default function FormPasien({ onSubmit, loading }) {
 
         <Grid item xs={12} md={4}>
           <Controller
-            name="telepon"
+            name="deskripsi"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                label="Nomor Telepon"
-                placeholder="0812..."
+                label="Deskripsi"
+                placeholder="Masukan Deskripsi"
                 slotProps={{
                   input: {
                     startAdornment: (

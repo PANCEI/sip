@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import FormPasien from "./FormPasien";
 import TablePasien from "./TablePasien";
-
+import { useLocalStorageEncrypt } from "../../helper/CostumHook";
+import { Api1 } from "../../utils/Api1";
 export default function MasterPasien() {
   const [loading, setLoading] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [listPasien, setListPasien] = useState([]);
+  const [token] = useLocalStorageEncrypt('token',null);
 
   const loadData = () => {
     setRefreshLoading(true);
@@ -24,13 +26,22 @@ export default function MasterPasien() {
     loadData();
   }, []);
 
-  const handleSimpan = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      setListPasien((prev) => [...prev, data]);
-      setLoading(false);
-      alert("Berhasil disimpan!");
-    }, 1000);
+  const handleSimpan = async (form) => {
+   // setLoading(true);
+    console.log(form);
+    try{
+      const {data, status} = await Api1('/add-master-pasien', 'POST', form,{
+         Authorization: `Bearer ${token}` 
+      })
+      console.log('data', data);
+    }catch(error){
+      console.log('gagal  dari api', error);
+    }
+    // setTimeout(() => {
+    //   setListPasien((prev) => [...prev, data]);
+    //   setLoading(false);
+    //   alert("Berhasil disimpan!");
+    // }, 1000);
   };
 
   return (
