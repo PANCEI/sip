@@ -124,12 +124,15 @@ export default function FormPasien({ onSubmit, loading }) {
           <Controller
             name="alamat"
             control={control}
+            rules={{ required: "Alamat pasien wajib diisi" }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
                 label="Alamat"
                 placeholder="Masukan Alamat Pasien"
+                  error={!!errors.alamat}
+                helperText={errors.alamat?.message}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -148,12 +151,15 @@ export default function FormPasien({ onSubmit, loading }) {
           <Controller
             name="tgl_lahir"
             control={control}
+              rules={{ required: "Tanggal Lahir pasien wajib diisi" }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
                 type="date"
                 label="Tanggal Lahir"
+                  error={!!errors.tgl_lahir}
+                helperText={errors.tgl_lahir?.message}
                 slotProps={{
                   inputLabel: { shrink: true },
                   input: {

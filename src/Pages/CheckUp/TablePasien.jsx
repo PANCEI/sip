@@ -1,24 +1,30 @@
-import { useState } from "react";
-import { 
-  Table, TableBody, TableCell, TableContainer, TableHead, 
-  TableRow, TablePagination, TextField, InputAdornment, 
-  Button, Stack, Tooltip, CircularProgress, Typography, Paper
+import { useState, useEffect } from "react";
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, TablePagination, TextField, InputAdornment,
+  Button, Stack, CircularProgress, Typography, Paper
 } from "@mui/material";
 import { Search, Refresh } from "@mui/icons-material";
 
-export default function TablePasien({ data, onRefresh, refreshLoading }) {
+export default function TablePasien({ data, totalData, onRefresh, refreshLoading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Logika Filter Data
-  const filteredData = data.filter((p) =>
-    p.nama_pasien.toLowerCase().includes(search.toLowerCase()) ||
-    p.no_rm.toLowerCase().includes(search.toLowerCase())
-  );
+  // Logika Debounce: Menunggu user berhenti mengetik selama 500ms
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      // Pastikan onRefresh dikirim dari parent (MasterPasien)
+      if (onRefresh) {
+        onRefresh(page + 1, rowsPerPage, search);
+      }
+    }, 500);
 
-  // Logika Pagination
+    return () => clearTimeout(delayDebounceFn);
+  }, [search, page, rowsPerPage]);
+
   const handleChangePage = (event, newPage) => setPage(newPage);
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -26,72 +32,87 @@ export default function TablePasien({ data, onRefresh, refreshLoading }) {
 
   return (
     <Paper elevation={3} sx={{ width: '100%', borderRadius: 3, overflow: 'hidden' }}>
-      {/* Toolbar: Search & Refresh */}
+      {/* TOOLBAR: SEARCH & REFRESH */}
       <Stack 
         direction={{ xs: "column", sm: "row" }} 
         spacing={2} 
-        sx={{ p: 3, bgcolor: "#fff" }}
-        justifyContent="space-between"
+        sx={{ p: 3, bgcolor: "#fff" }} 
+        justifyContent="space-between" 
         alignItems="center"
       >
         <TextField
-         label="Cari Pasien"
-         variant="outlined"
-            size="small"
+          label="Cari Pasien"
           placeholder="Cari Nama atau No. RM..."
+          size="small"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-  sx={{ width: { xs: "100%", sm: "300px" }, "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
-          
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search fontSize="small" />
-                </InputAdornment>
-              ),
-            },
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0); // Reset ke hal 1 saat mencari
+          }}
+          sx={{ width: { xs: "100%", sm: "300px" } }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search fontSize="small" />
+              </InputAdornment>
+            ),
           }}
         />
         
         <Button 
-          variant="outlined" 
-          startIcon={refreshLoading ? <CircularProgress size={20} /> : <Refresh />}
-          onClick={onRefresh}
+          variant="contained" 
+          disableElevation
+          onClick={() => onRefresh(page + 1, rowsPerPage, search)} 
           disabled={refreshLoading}
+          startIcon={refreshLoading ? <CircularProgress size={20} color="inherit" /> : <Refresh />}
         >
-          Refresh Data
+          {refreshLoading ? "Memuat..." : "Refresh"}
         </Button>
       </Stack>
 
-      {/* Table Content */}
-      <TableContainer>
-        <Table>
-          <TableHead sx={{ bgcolor: "#f8fafc" }}>
-           <TableRow sx={{ "& th": { fontWeight: "bold", bgcolor: "success.main", color: "white" } }}>
-              <TableCell sx={{ fontWeight: "bold" }}>No. RM</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Nama Pasien</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>NIK</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Telepon</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Alamat</TableCell>
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              {/* Styling Header agar lebih menonjol */}
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }}>No. RM</TableCell>
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }}>Nama Pasien</TableCell>
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }}>Alamat</TableCell>
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }}>Tanggal Lahir</TableCell>
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }}>Deskripsi</TableCell>
+              <TableCell sx={{ bgcolor: "primary.main", color: "white", fontWeight: "bold" }} align="center">Aksi</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow key={index} hover>
-                  <TableCell sx={{ fontWeight: "600", color: "primary.main" }}>{row.no_rm}</TableCell>
-                  <TableCell>{row.nama_pasien}</TableCell>
-                  <TableCell>{row.nik}</TableCell>
-                  <TableCell>{row.telepon}</TableCell>
-                  <TableCell>{row.alamat}</TableCell>
-                </TableRow>
-              ))}
-            {filteredData.length === 0 && (
+            {refreshLoading ? (
+              // Tampilan saat sedang loading
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                  <Typography variant="body2" color="text.secondary">Data tidak ditemukan</Typography>
+                <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
+                  <CircularProgress size={40} />
+                  <Typography sx={{ mt: 2 }} color="text.secondary">Mengambil data database...</Typography>
+                </TableCell>
+              </TableRow>
+            ) : data && data.length > 0 ? (
+              // Tampilan saat data ada
+              data.map((row, index) => (
+                <TableRow key={row.id || index} hover>
+                  <TableCell sx={{ fontWeight: "600", color: "primary.dark" }}>{row.no_rm}</TableCell>
+                  <TableCell>{row.nama_pasien}</TableCell>
+                  <TableCell>{row.alamat || "-"}</TableCell>
+                  <TableCell>{row.tanggal_lahir || "-"}</TableCell>
+                  <TableCell>{row.deskripsi || "-"}</TableCell>
+                  <TableCell align="center">
+                     <Button size="small" variant="outlined" color="info">{totalData}</Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              // Tampilan saat data kosong
+              <TableRow>
+                <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    Tidak ada data pasien ditemukan.
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -102,7 +123,7 @@ export default function TablePasien({ data, onRefresh, refreshLoading }) {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredData.length}
+        count={totalData || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
