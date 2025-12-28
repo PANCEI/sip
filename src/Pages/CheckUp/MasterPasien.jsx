@@ -4,14 +4,14 @@ import FormPasien from "./FormPasien";
 import TablePasien from "./TablePasien";
 import { useLocalStorageEncrypt } from "../../helper/CostumHook";
 import { Api1 } from "../../utils/Api1";
-
+import { Toast } from "../../components/Toast";
 export default function MasterPasien() {
   const [loading, setLoading] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [listPasien, setListPasien] = useState([]);
   const [totalData, setTotalData] = useState(2);
   const [token] = useLocalStorageEncrypt('token', null);
-
+  const showToast = Toast();
   // State untuk notifikasi (Snackbar)
   const [noti, setNoti] = useState({ open: false, msg: "", type: "success" });
 
@@ -27,10 +27,10 @@ export default function MasterPasien() {
       });
 
       if (status === 200 && data.message === 'berhasil') {
-        setListPasien(data.data); 
+        setListPasien(data.data);
         setTotalData(data.total); // Menyimpan total row dari DB untuk pagination
-        console.log('totoal data ',data.total);
-        console.log('totoal data ',data.data);
+        console.log('totoal data ', data.total);
+        console.log('totoal data ', data.data);
       }
     } catch (error) {
       console.error('Gagal memuat data:', error);
@@ -45,18 +45,32 @@ export default function MasterPasien() {
   }, [loadData]);
 
   const handleSimpan = async (form) => {
+
     setLoading(true);
     try {
-      const { data, status } = await Api1('/add-master-pasien', 'POST', form, {
-        Authorization: `Bearer ${token}`
-      });
-
-      if (status === 200 || status === 201) {
-        setNoti({ open: true, msg: "Data pasien berhasil disimpan!", type: "success" });
-        // Refresh data ke halaman 1 dengan limit 5 setelah simpan berhasil
-        loadData(1, 5, "");
+      if (form.id) {
+        console.log(form);
+        const { data, status } = await Api1('/edit-master-pasien', 'PUT', form, {
+          Authorization: `Bearer ${token}`
+        });
+        if (status === 200 || status === 200) {
+          showToast("success", 'Master Pasien Berhasil Di Ubah');
+          loadData(1, 5, "");
+        } else {
+          showToast("error", 'Master Pasien Gagal Di Ubah');
+        }
       } else {
-        setNoti({ open: true, msg: data.message || "Gagal menyimpan data", type: "error" });
+        const { data, status } = await Api1('/add-master-pasien', 'POST', form, {
+          Authorization: `Bearer ${token}`
+        });
+
+        if (status === 200 || status === 201) {
+          setNoti({ open: true, msg: "Data pasien berhasil disimpan!", type: "success" });
+          // Refresh data ke halaman 1 dengan limit 5 setelah simpan berhasil
+          loadData(1, 5, "");
+        } else {
+          setNoti({ open: true, msg: data.message || "Gagal menyimpan data", type: "error" });
+        }
       }
     } catch (error) {
       console.error('Error saat simpan:', error);
@@ -65,15 +79,38 @@ export default function MasterPasien() {
       setLoading(false);
     }
   };
-
+  const UbahFlag = async (form) => {
+    console.log(form);
+    try {
+      const newStatus = form.flag_delete === 0 ? 1 : 0;
+      const { data, status } = await Api1('/ubah-status-master-pasien', 'PATCH', {
+        id: form.id,
+        flag_delete: newStatus
+      }, { Authorization: `Bearer ${token}` }
+      )
+      if (status === 200 || status === 201) {
+        setListPasien((prev) =>
+          prev.map((pasien) =>
+            pasien.id === form.id ? { ...pasien, flag_delete: newStatus } : pasien
+          )
+        );
+        showToast("success", 'Status Berhasil di Ubah');
+      } else {
+        showToast("success", 'Status Gagal di Ubah');
+      }
+      console.log(data);
+    } catch (error) {
+      console.log('gagal dari api', error);
+    }
+  }
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Box 
-        sx={{ 
-          display: "flex", 
-          flexDirection: { xs: "column", lg: "row" }, 
-          gap: 3, 
-          alignItems: "flex-start" 
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          gap: 3,
+          alignItems: "flex-start"
         }}
       >
         {/* SISI KIRI: Form */}
@@ -92,19 +129,21 @@ export default function MasterPasien() {
 
         {/* SISI KANAN: Tabel */}
         <Box sx={{ flex: "1 1 auto", width: "100%", minWidth: 0 }}>
-          <TablePasien 
-            data={listPasien} 
+          <TablePasien
+            data={listPasien}
             totalData={totalData}
-            onRefresh={loadData} 
-            refreshLoading={refreshLoading} 
+            onRefresh={loadData}
+            refreshLoading={refreshLoading}
+            onSubmit={handleSimpan}
+            UbahStatus={UbahFlag}
           />
         </Box>
       </Box>
 
       {/* Snackbar untuk Feedback User */}
-      <Snackbar 
-        open={noti.open} 
-        autoHideDuration={4000} 
+      <Snackbar
+        open={noti.open}
+        autoHideDuration={4000}
         onClose={() => setNoti({ ...noti, open: false })}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >

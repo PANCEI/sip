@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, TablePagination, TextField, InputAdornment,
-  Button, Stack, CircularProgress, Typography, Paper,Tooltip,IconButton,Switch
+  Button, Stack, CircularProgress, Typography, Paper, Tooltip, IconButton, Switch
 } from "@mui/material";
 import { Search, Refresh } from "@mui/icons-material";
 import PopUpCostum from "../../components/PopUpCostum";
 import EditIcon from '@mui/icons-material/Edit';
 import FormModalPasien from "./formModalPasien";
-export default function TablePasien({ data, totalData, onRefresh, refreshLoading }) {
+export default function TablePasien({ data, totalData, onRefresh, refreshLoading, onSubmit, UbahStatus }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [open , setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState([]);
   // Logika Debounce: Menunggu user berhenti mengetik selama 500ms
   useEffect(() => {
@@ -32,20 +32,21 @@ export default function TablePasien({ data, totalData, onRefresh, refreshLoading
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-const handleSubmit = async (form)=>{
-  console.log(form);
-}
-const handleToggleStatus= async (form)=>{
-  console,log(form)
-}
+  const handleSubmit = async (form) => {
+    setOpen(false);
+    onSubmit(form);
+  }
+  const handleToggleStatus = async (form) => {
+    UbahStatus(form)
+  }
   return (
     <Paper elevation={3} sx={{ width: '100%', borderRadius: 3, overflow: 'hidden' }}>
       {/* TOOLBAR: SEARCH & REFRESH */}
-      <Stack 
-        direction={{ xs: "column", sm: "row" }} 
-        spacing={2} 
-        sx={{ p: 3, bgcolor: "#fff" }} 
-        justifyContent="space-between" 
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ p: 3, bgcolor: "#fff" }}
+        justifyContent="space-between"
         alignItems="center"
       >
         <TextField
@@ -66,11 +67,11 @@ const handleToggleStatus= async (form)=>{
             ),
           }}
         />
-        
-        <Button 
-          variant="contained" 
+
+        <Button
+          variant="contained"
           disableElevation
-          onClick={() => onRefresh(page + 1, rowsPerPage, search)} 
+          onClick={() => onRefresh(page + 1, rowsPerPage, search)}
           disabled={refreshLoading}
           startIcon={refreshLoading ? <CircularProgress size={20} color="inherit" /> : <Refresh />}
         >
@@ -110,37 +111,37 @@ const handleToggleStatus= async (form)=>{
                   <TableCell>{row.alamat || "-"}</TableCell>
                   <TableCell>{row.tanggal_lahir || "-"}</TableCell>
                   <TableCell>{row.deskripsi || "-"}</TableCell>
-                    <TableCell>
-                            <Tooltip
-                              title={
-                                row.flag_delete === 1
-                                  ? "Klik untuk mengaktifkan"
-                                  : "Klik untuk menonaktifkan"
-                              }
-                            >
-                              <Switch
-                                checked={row.flag_delete === 0}
-                                onChange={() => handleToggleStatus(row)}
-                                color={row.flag_delete === 1 ? "error" : "success"}
-                              />
-                            </Tooltip>
-                            {row.flag_delete === 1 ? "Nonaktif" : "Aktif"}
-                          </TableCell>
+                  <TableCell>
+                    <Tooltip
+                      title={
+                        row.flag_delete === 1
+                          ? "Klik untuk mengaktifkan"
+                          : "Klik untuk menonaktifkan"
+                      }
+                    >
+                      <Switch
+                        checked={row.flag_delete === 0}
+                        onChange={() => handleToggleStatus(row)}
+                        color={row.flag_delete === 1 ? "error" : "success"}
+                      />
+                    </Tooltip>
+                    {row.flag_delete === 1 ? "Nonaktif" : "Aktif"}
+                  </TableCell>
                   <TableCell align="center">
-                        <Tooltip
-                              color="primary"
-                              aria-label="Edit Master Obat"
-                              onClick={() => {
-                                setEditData(row);
-                                setOpen(true);
-                              }
-                                
-                              }
-                            >
-                              <IconButton>
-                                <EditIcon></EditIcon>
-                              </IconButton>
-                            </Tooltip>
+                    <Tooltip
+                      color="primary"
+                      aria-label="Edit Master Obat"
+                      onClick={() => {
+                        setEditData(row);
+                        setOpen(true);
+                      }
+
+                      }
+                    >
+                      <IconButton>
+                        <EditIcon></EditIcon>
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))
@@ -168,18 +169,17 @@ const handleToggleStatus= async (form)=>{
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Baris:"
       />
-     <PopUpCostum
-     open={open}
-     handleClose={()=>{
-      setOpen(false)
-      setEditData(null)
-     }}
-     children={<FormModalPasien onSubmit={handleSubmit} initialData={editData}/>}
-     title="Edit Master Pasien"
-     
-     >
+      <PopUpCostum
+        open={open}
+        handleClose={() => {
+          setOpen(false)
+          setEditData(null)
+        }}
+        children={<FormModalPasien onSubmit={handleSubmit} initialData={editData} />}
+        title="Edit Master Pasien"
 
-     </PopUpCostum>
+     />
+      
     </Paper>
 
   );

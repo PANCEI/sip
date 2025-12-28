@@ -115,8 +115,22 @@ export default function FormModalPasien({ onSubmit, initialData }) {
               )}
             />
           </FormControl>
+         <button
+            type="submit"
+            style={{
+              background: "#1976d2",
+              color: "white",
+              padding: "12px 16px",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              marginTop: "10px"
+            }}
+          >
+            Simpan Perubahan
+          </button>
         </Stack>
-
       </form>
     </>
   );
