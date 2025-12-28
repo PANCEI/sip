@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import MasterPasien from "./MasterPasien";
-
+import FormCheckUp from "./FormCheckUp";
 export default function CheckUp() {
   const [activeTab, setActiveTab] = useState(0); // Default ke tab pertama (indeks 0)
 
@@ -79,7 +79,7 @@ export default function CheckUp() {
             </Box>
           ) : (
             <Box sx={{ p: 4 }}>
-              <Typography>Konten Check Up</Typography>
+         <FormCheckUp/>
             </Box>
           )}
         </CardContent>
