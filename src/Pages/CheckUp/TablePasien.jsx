@@ -7,6 +7,7 @@ import {
 import { Search, Refresh } from "@mui/icons-material";
 import PopUpCostum from "../../components/PopUpCostum";
 import EditIcon from '@mui/icons-material/Edit';
+import FormModalPasien from "./formModalPasien";
 export default function TablePasien({ data, totalData, onRefresh, refreshLoading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -173,6 +174,7 @@ const handleToggleStatus= async (form)=>{
       setOpen(false)
       setEditData(null)
      }}
+     children={<FormModalPasien onSubmit={handleSubmit} initialData={editData}/>}
      title="Edit Master Pasien"
      
      >
