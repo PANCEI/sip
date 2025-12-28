@@ -9,7 +9,7 @@ import {
   InputLabel, 
   FormHelperText 
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
 export default function FormModalPasien ({onSubmit , initialData}){
     const {control , handleSubmit ,reset, formState: { errors }  } = useForm({
@@ -27,7 +27,7 @@ useEffect(()=>{
     reset({
       id:initialData.id,
       nama_pasien:initialData.nama_pasien,
-      no_rm:initialData.nama_pasien,
+      no_rm:initialData.no_rm,
       alamat:initialData.alamat,
       tgl_lahir:initialData.tanggal_lahir,
       deskripsi:initialData.deskripsi
@@ -39,7 +39,49 @@ return (
   <form onSubmit={handleSubmit(onSubmit)}>
   <Stack spacing={3} sx={{mt:1}}>
   <FormControl fullWidth>
-
+  <Controller
+  name="no_rm"
+  control={control}
+  render={({field})=>(
+    <TextField
+    {...field}
+    label="Kode RM"
+    variant="outlined"
+    fullWidth
+    disabled
+    />
+  )}
+  />
+  </FormControl>
+  <FormControl fullWidth>
+  <Controller
+  name="nama_pasien"
+  control={control}
+  render={({field})=>(
+    <TextField
+    {...field}
+    label="Nama Pasien"
+    variant="outlined"
+    fullWidth
+    
+    />
+  )}
+  />
+  </FormControl>
+  <FormControl fullWidth>
+  <Controller
+  name="alamat"
+  control={control}
+  render={({field})=>(
+    <TextField
+    {...field}
+    label="Alamat"
+    variant="outlined"
+    fullWidth
+    
+    />
+  )}
+  />
   </FormControl>
   </Stack>
 
