@@ -82,6 +82,20 @@ export default function FormCheckUp() {
         try {
             console.log("Payload:", data);
             alert("Data berhasil disimpan!");
+            reset({
+                nama_pasien: "", 
+                nama_dokter: "", 
+                sistolik: "",
+                diastolik: "",
+                tanggal: today,
+                keterangan: ""
+            });
+
+            // 3. Reset State Lokal Autocomplete agar tampilan input bersih
+            setSelectedPatient(null);
+            setSelectedDoctor(null);
+            setInputValue("");
+            setDoctorInput("");
         } catch (error) {
             console.error(error);
         } finally {
