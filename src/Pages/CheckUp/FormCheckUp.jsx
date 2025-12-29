@@ -1,23 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
     FormControl, TextField, Box, Typography, Paper, CircularProgress, Autocomplete, InputAdornment
 } from "@mui/material";
-import { Fingerprint } from "@mui/icons-material"; // Pastikan sudah install @mui/icons-material
+import { Fingerprint } from "@mui/icons-material";
+import { useLocalStorageEncrypt } from "../../helper/CostumHook";
+import { Api1 } from "../../utils/Api1";
 
 export default function FormCheckUp() {
     const [options, setOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    
+    // State tambahan untuk menyimpan objek pasien yang sedang dipilih
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [token] = useLocalStorageEncrypt('token', null);
+
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
-            nama_pasien: "" // Ini akan menyimpan ID atau Kode Pasien
+            nama_pasien: "" 
         }
     });
 
     useEffect(() => {
-        // Jangan mencari jika input terlalu pendek (misal kurang dari 2 huruf)
+        // HANYA ambil data jika user sedang mengetik (bukan saat memilih dari list)
         if (inputValue.length < 2) {
             setOptions([]);
             return;
@@ -26,30 +31,29 @@ export default function FormCheckUp() {
         const getData = setTimeout(async () => {
             setLoading(true);
             try {
-                // Ganti dengan endpoint API Anda yang sebenarnya
-                const response = await fetch(`/api/pasien?search=${inputValue}`);
-                const data = await response.json();
-                setOptions(data); // Ekspektasi API: [{ no_rm: '001', nama_pasien: 'Budi' }]
+                const { data, status } = await Api1(`/get-pasien-check?search=${inputValue}`, 'GET', {}, {
+                    Authorization: `Bearer ${token}`
+                });
+                if (status === 200) {
+                    setOptions(data);
+                }
             } catch (error) {
                 console.error("Fetch error:", error);
                 setOptions([]);
             } finally {
                 setLoading(false);
             }
-        }, 500); // Debounce 500ms
+        }, 500);
 
         return () => clearTimeout(getData);
-    }, [inputValue]);
+    }, [inputValue, token]);
 
     return (
         <Box sx={{ p: 4, display: "flex", justifyContent: "center" }}>
-            <Paper elevation={2} sx={{ width: "100%", maxWidth: 600, p: 5, borderRadius: 1 }}>
+            <Paper elevation={2} sx={{ width: "100%", maxWidth: 800, p: 5, borderRadius: 1 }}>
                 <Box sx={{ mb: 4 }}>
                     <Typography variant="h5" sx={{ fontWeight: 800, color: "#2c3e50" }}>
                         Pemeriksaan Pasien
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#7f8c8d" }}>
-                        Pastikan data yang dimasukkan sesuai Keadaan Pasien.
                     </Typography>
                 </Box>
 
@@ -59,24 +63,30 @@ export default function FormCheckUp() {
                             name="nama_pasien"
                             control={control}
                             rules={{ required: "Pasien harus dipilih" }}
-                            render={({ field: { onChange, value } }) => (
+                            render={({ field: { onChange } }) => (
                                 <Autocomplete
                                     options={options}
                                     loading={loading}
-                                    // Mencocokkan nilai ID yang tersimpan di form dengan opsi di list
-                                    value={options.find((item) => item.no_rm === value) || null}
-                                    onInputChange={(event, newInputValue) => {
-                                        setInputValue(newInputValue);
+                                    // Gunakan state selectedPatient agar label tetap muncul
+                                    value={selectedPatient}
+                                    onInputChange={(event, newInputValue, reason) => {
+                                        // Mencegah API terpanggil ulang saat item dipilih (reason: 'reset')
+                                        if (reason === 'input') {
+                                            setInputValue(newInputValue);
+                                        }
                                     }}
-                                    getOptionLabel={(option) => 
-                                        typeof option === 'string' ? option : `${option.no_rm} - ${option.nama_pasien}`
-                                    }
-                                    isOptionEqualToValue={(option, val) => option.no_rm === val.no_rm}
-                                    filterOptions={(x) => x} 
                                     onChange={(_, newValue) => {
-                                        // Simpan no_rm ke state form
+                                        // Simpan objek lengkap ke state lokal untuk tampilan
+                                        console.log(newValue);
+                                        setSelectedPatient(newValue);
+                                        // Simpan no_rm ke react-hook-form
                                         onChange(newValue ? newValue.no_rm : "");
                                     }}
+                                    getOptionLabel={(option) => 
+                                        option ? `${option.no_rm} - ${option.nama_pasien}` : ""
+                                    }
+                                    isOptionEqualToValue={(option, value) => option.no_rm === value.no_rm}
+                                    filterOptions={(x) => x} // Data sudah difilter oleh API
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
