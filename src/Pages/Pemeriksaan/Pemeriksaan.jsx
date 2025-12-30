@@ -1,161 +1,96 @@
+import { useState } from "react";
 import {
     Card,
     CardContent,
     Typography,
     Paper,
     Box,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Divider,
 } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import PersonIcon from '@mui/icons-material/Person'; // Tambahan icon untuk estetika
+import PatientList from "./PatientList";
 
 export default function Pemeriksaan() {
-    // Contoh data pasien
-    const patients = [
-        { id: 1, name: "Budi Santoso", age: 45 },
-        { id: 2, name: "Siti Aminah", age: 30 },
-        { id: 3, name: "Andi Wijaya", age: 28 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-        { id: 4, name: "Dewi Lestari", age: 35 },
-    ];
+    // Gunakan useState agar list bisa dimanipulasi (dihapus)
+    const [dataPasien, setDataPasien] = useState([
+        { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
+        { id: "002", name: "Siti Aminah", norm: "RM-2023-002" },
+        { id: "003", name: "Andi Wijaya", norm: "RM-2023-003" },
+        { id: "004", name: "Dewi Lestari", norm: "RM-2023-004" },
+    ]);
 
-    const handlePatientClick = (patient) => {
-        console.log("Memilih pasien:", patient.name);
-        // Tambahkan logika Anda di sini (misal: set state untuk menampilkan detail di sisi kanan)
+    const [lastSelected, setLastSelected] = useState(null);
+
+    const handleSelectPatient = (patient) => {
+        // 1. Simpan data yang dipilih ke state (untuk ditampilkan di kanan jika perlu)
+        setLastSelected(patient);
+
+        // 2. Hapus pasien dari list berdasarkan ID
+        setDataPasien((prevList) => prevList.filter((item) => item.id !== patient.id));
+
+        console.log(`Pasien ${patient.name} dipilih dan dihapus dari daftar.`);
     };
-
+    const handleReloadData = () => {
+        console.log("Mengambil data ulang...");
+        // Contoh reset data dummy
+        setDataPasien([
+            { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
+            { id: "002", name: "Siti Aminah", norm: "RM-2023-002" },
+            { id: "003", name: "Andi Wijaya", norm: "RM-2023-003" },
+        ]);
+    };
     return (
-        <Box
-            sx={{
-                p: { xs: 1, md: 2 },
-                backgroundColor: "#f4f6f8",
-                display: "flex",
-                justifyContent: "center",
-                
-            }}
-        >
-            <Card
-                sx={{
-                    borderRadius: 3,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-                    width: "100%",
-                    maxWidth: "1800px",
-                }}
-            >
+        <Box sx={{ p: { xs: 1, md: 2 }, backgroundColor: "#f4f6f8", minHeight: "100vh", display: "flex", justifyContent: "center" }}>
+            <Card sx={{ borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: "100%", maxWidth: "1800px" }}>
                 <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                        <Box
-                            sx={{
-                                p: 1,
-                                backgroundColor: "#1976d2",
-                                borderRadius: 1.5,
-                                display: "flex",
-                                mr: 2,
-                            }}
-                        >
+                        <Box sx={{ p: 1, backgroundColor: "#1976d2", borderRadius: 1.5, display: "flex", mr: 2 }}>
                             <AccountBoxIcon sx={{ color: "#fff", fontSize: 24 }} />
                         </Box>
-                        <Box>
-                            <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
-                                Pemeriksaan Pasien
-                            </Typography>
-                        </Box>
+                        <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
+                            Pemeriksaan Pasien
+                        </Typography>
                     </Box>
 
-                    <Box>
-                        <Box
-                            sx={{
-                                display: "flex",
-                                flexDirection: { xs: "column", lg: "row" },
-                                gap: 3,
-                                alignItems: "flex-start"
-                            }}
-                        >
-                            {/* SISI KIRI: LIST PASIEN */}
-                            <Box sx={{ flex: { xs: "1 1 100%", lg: "0 0 380px" }, width: "100%" }}>
-                                <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden" }}>
-                                    <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', bgcolor: '#fff' }}>
-                                        <Typography variant="h6" fontWeight="700">
-                                            List Data Pasien
-                                        </Typography>
-                                    </Box>
-                                    
-                                    <List sx={{ p: 0, maxHeight: '600px', overflow: 'auto' }}>
-                                        {patients.map((patient, index) => (
-                                            <Box key={patient.id}>
-                                                <ListItem disablePadding>
-                                                    <ListItemButton 
-                                                        onClick={() => handlePatientClick(patient)}
-                                                        sx={{ py: 1.5 }}
-                                                    >
-                                                        <PersonIcon sx={{ mr: 2, color: '#94a3b8' }} />
-                                                        <ListItemText 
-                                                            primary={patient.name} 
-                                                            secondary={`Usia: ${patient.age} tahun`}
-                                                            primaryTypographyProps={{ fontWeight: '600', color: '#334155' }}
-                                                        />
-                                                    </ListItemButton>
-                                                </ListItem>
-                                                {index < patients.length - 1 && <Divider />}
-                                            </Box>
-                                        ))}
-                                    </List>
-                                </Paper>
-                            </Box>
+                    <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 3, alignItems: "flex-start" }}>
+                        {/* SISI KIRI: LIST PASIEN */}
+                        <Box sx={{ flex: { xs: "1 1 100%", lg: "0 0 380px" }, width: "100%" }}>
+                            <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden" }}>
+                                <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', bgcolor: '#fff' }}>
+                                    <Typography variant="subtitle1" fontWeight="700">
+                                        Antrean Pasien ({dataPasien.length})
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ maxHeight: '500px', overflowY: 'auto' }}>
+                                    {dataPasien.length > 0 ? (
+                                        <PatientList
+                                            patients={dataPasien}
+                                            onPatientClick={handleSelectPatient}
+                                            onReload={handleReloadData} // Pasang fungsi reload di sini
+                                        />
+                                    ) : (
+                                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                                            <Typography variant="body2" color="textSecondary">
+                                                Tidak ada pasien dalam antrean
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Paper>
+                        </Box>
 
-                            {/* SISI KANAN: DETAIL PEMERIKSAAN */}
-                            <Box sx={{ flex: "1 1 auto", width: "100%", minWidth: 0 }}>
-                                <Paper elevation={0} variant="outlined" sx={{ p: 3, borderRadius: 3, textAlign: 'center', color: '#94a3b8' }}>
-                                    Pilih pasien di sebelah kiri untuk melihat detail pemeriksaan.
-                                </Paper>
-                            </Box>
+                        {/* SISI KANAN: AREA DETAIL */}
+                        <Box sx={{ flex: "1 1 auto", width: "100%", minWidth: 0 }}>
+                            <Paper sx={{ p: 4, borderRadius: 3, border: '2px dashed #e2e8f0', bgcolor: '#f8fafc', textAlign: 'center' }}>
+                                {lastSelected ? (
+                                    <Typography variant="h6" color="primary">
+                                        Memproses Pemeriksaan: {lastSelected.name}
+                                    </Typography>
+                                ) : (
+                                    <Typography color="textSecondary">
+                                        Pilih pasien untuk memulai pemeriksaan
+                                    </Typography>
+                                )}
+                            </Paper>
                         </Box>
                     </Box>
                 </CardContent>
