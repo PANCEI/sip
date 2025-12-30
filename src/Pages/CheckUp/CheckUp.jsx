@@ -22,7 +22,7 @@ export default function CheckUp() {
       sx={{
         p: { xs: 1, md: 2 }, // Perkecil padding Box luar
         backgroundColor: "#f4f6f8",
-      
+
         display: "flex",
         justifyContent: "center",
       }}
@@ -31,9 +31,9 @@ export default function CheckUp() {
         sx={{
           borderRadius: 3,
           boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-          width: "100%", 
+          width: "100%",
           // PENTING: Jangan gunakan 90%, gunakan 100% atau maxWidth yang sangat lebar
-          maxWidth: "1800px", 
+          maxWidth: "1800px",
         }}
       >
         <CardContent sx={{ p: { xs: 2, md: 3 } }}>
@@ -79,7 +79,7 @@ export default function CheckUp() {
             </Box>
           ) : (
             <Box sx={{ p: 4 }}>
-         <FormCheckUp/>
+              <FormCheckUp />
             </Box>
           )}
         </CardContent>
