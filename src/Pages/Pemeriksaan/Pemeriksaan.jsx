@@ -20,6 +20,13 @@ export default function Pemeriksaan() {
         { id: "004", name: "Dewi Lestari", norm: "RM-2023-004" },
     ]);
 
+    const getDataPasien= async ()=>{
+        try{
+            const {data , status}= await Api1()
+        }catch(error){
+            console.log(error);
+        }
+    }
     const [lastSelected, setLastSelected] = useState(null);
 
     const handleSelectPatient = (patient) => {
