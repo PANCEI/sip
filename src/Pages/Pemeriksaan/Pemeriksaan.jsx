@@ -8,8 +8,10 @@ import {
 } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import PatientList from "./PatientList";
-
+import { useLocalStorageEncrypt } from "../../helper/CostumHook";
+import { Api1 } from "../../utils/Api1";
 export default function Pemeriksaan() {
+    const [token]= useLocalStorageEncrypt('token', null);
     // Gunakan useState agar list bisa dimanipulasi (dihapus)
     const [dataPasien, setDataPasien] = useState([
         { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },

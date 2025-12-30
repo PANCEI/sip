@@ -1,3 +1,4 @@
+import { useState } from "react"; // Tambahkan useState
 import {
     List,
     ListItem,
@@ -8,16 +9,30 @@ import {
     Box,
     IconButton,
     Typography,
-    Tooltip
+    Tooltip,
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 export default function PatientList({ patients, onPatientClick, onReload }) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleReloadInternal = async () => {
+        setIsRefreshing(true);
+        
+        // Menjalankan fungsi reload dari props
+        // Jika onReload adalah fungsi async, kita tunggu hingga selesai
+        await onReload();
+
+        // Berikan sedikit delay agar animasi terlihat halus sebelum berhenti
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 500);
+    };
+
     return (
         <Box sx={{ width: '100%' }}>
-            {/* Bagian Header List dengan tombol Reload */}
             <Box 
                 sx={{ 
                     px: 2, 
@@ -32,13 +47,25 @@ export default function PatientList({ patients, onPatientClick, onReload }) {
                 <Typography variant="caption" fontWeight="700" color="textSecondary">
                     {patients.length} PASIEN TERSEDIA
                 </Typography>
+                
                 <Tooltip title="Reload Data">
                     <IconButton 
                         size="small" 
-                        onClick={onReload}
+                        onClick={handleReloadInternal}
+                        disabled={isRefreshing}
                         sx={{ color: '#1976d2' }}
                     >
-                        <RefreshIcon fontSize="small" />
+                        <RefreshIcon 
+                            fontSize="small" 
+                            sx={{ 
+                                // Animasi putar
+                                animation: isRefreshing ? "spin 1s linear infinite" : "none",
+                                "@keyframes spin": {
+                                    "0%": { transform: "rotate(0deg)" },
+                                    "100%": { transform: "rotate(360deg)" }
+                                }
+                            }} 
+                        />
                     </IconButton>
                 </Tooltip>
             </Box>
