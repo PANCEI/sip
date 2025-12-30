@@ -12,6 +12,7 @@ import { useLocalStorageEncrypt } from "../../helper/CostumHook";
 import { Api1 } from "../../utils/Api1";
 export default function Pemeriksaan() {
     const [token]= useLocalStorageEncrypt('token', null);
+    const [user] = useLocalStorageEncrypt('user', null);
     // Gunakan useState agar list bisa dimanipulasi (dihapus)
     const [dataPasien, setDataPasien] = useState([
         { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
@@ -22,11 +23,15 @@ export default function Pemeriksaan() {
 
     const getDataPasien= async ()=>{
         try{
-            const {data , status}= await Api1()
+            const {data , status}= await Api1('/pasien-today','GET',user,{
+               Authorization: `Bearer ${token}`,  
+            })
+            console.log(data);
         }catch(error){
             console.log(error);
         }
     }
+    getDataPasien();
     const [lastSelected, setLastSelected] = useState(null);
 
     const handleSelectPatient = (patient) => {
