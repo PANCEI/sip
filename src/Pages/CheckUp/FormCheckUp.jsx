@@ -10,8 +10,9 @@ import {
 } from "@mui/icons-material";
 import { useLocalStorageEncrypt } from "../../helper/CostumHook";
 import { Api1 } from "../../utils/Api1";
-
+import { Toast } from "../../components/Toast";
 export default function FormCheckUp() {
+    const ShowToast= Toast();
     const [options, setOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
@@ -29,12 +30,12 @@ export default function FormCheckUp() {
 
     const { control, handleSubmit, reset, formState: { errors }, watch } = useForm({
         defaultValues: {
-            nama_pasien: "", 
-            nama_dokter: "", 
+            id_pasien: "", 
+            id_dokter: "", 
             sistolik: "",
             diastolik: "",
             tanggal: today,
-            keterangan: ""
+            keluhan: ""
         }
     });
 
@@ -77,25 +78,30 @@ export default function FormCheckUp() {
         return () => clearTimeout(timer);
     }, [doctorInput, token]);
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (form) => {
         setIsSubmitting(true);
         try {
-            console.log("Payload:", data);
-            alert("Data berhasil disimpan!");
-            reset({
-                nama_pasien: "", 
-                nama_dokter: "", 
-                sistolik: "",
-                diastolik: "",
-                tanggal: today,
-                keterangan: ""
-            });
-
-            // 3. Reset State Lokal Autocomplete agar tampilan input bersih
-            setSelectedPatient(null);
-            setSelectedDoctor(null);
-            setInputValue("");
-            setDoctorInput("");
+            const {data, status} = await Api1('/add-pemeriksaan-pasien', 'POST',form,{
+                Authorization: `Bearer ${token}` 
+            })
+            if(status ===200){
+                console.log("Payload:", form);
+                ShowToast("success", "Data berhasil disimpan");
+                reset({
+                    id_pasien: "", 
+                    id_dokter: "", 
+                    sistolik: "",
+                    diastolik: "",
+                    tanggal: today,
+                    keluhan: ""
+                });
+    
+                // 3. Reset State Lokal Autocomplete agar tampilan input bersih
+                setSelectedPatient(null);
+                setSelectedDoctor(null);
+                setInputValue("");
+                setDoctorInput("");
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -116,7 +122,7 @@ export default function FormCheckUp() {
                     <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
                         <FormControl fullWidth>
                             <Controller
-                                name="nama_pasien"
+                                name="id_pasien"
                                 control={control}
                                 rules={{ required: "Pasien harus dipilih" }}
                                 render={({ field: { onChange } }) => (
@@ -124,11 +130,11 @@ export default function FormCheckUp() {
                                         options={options}
                                         loading={loading}
                                         value={selectedPatient}
-                                        isOptionEqualToValue={(option, value) => option.no_rm === value?.no_rm}
+                                        isOptionEqualToValue={(option, value) => option.id === value?.id}
                                         onInputChange={(_, val, reason) => { if (reason === 'input') setInputValue(val); }}
                                         onChange={(_, newValue) => {
                                             setSelectedPatient(newValue);
-                                            onChange(newValue ? newValue.no_rm : "");
+                                            onChange(newValue ? newValue.id : "");
                                         }}
                                         getOptionLabel={(opt) => opt ? `${opt.no_rm} - ${opt.nama_pasien}` : ""}
                                         renderInput={(params) => (
@@ -158,7 +164,7 @@ export default function FormCheckUp() {
 
                         <FormControl fullWidth>
                             <Controller
-                                name="nama_dokter"
+                                name="id_dokter"
                                 control={control}
                                 rules={{ required: "Dokter harus dipilih" }}
                                 render={({ field: { onChange } }) => (
@@ -273,7 +279,7 @@ export default function FormCheckUp() {
 
                     <Box sx={{ mb: 4 }}>
                         <Controller
-                            name="keterangan"
+                            name="keluhan"
                             control={control}
                             render={({ field }) => (
                                 <TextField
@@ -281,7 +287,7 @@ export default function FormCheckUp() {
                                     fullWidth
                                     multiline
                                     rows={4}
-                                    label="Keterangan / Catatan Medis"
+                                    label="Keluhan Pasien/ Serta Pemeriksaan Tambahan"
                                     placeholder="Tuliskan detail pemeriksaan atau keluhan pasien di sini..."
                                     slotProps={{
                                         input: {
