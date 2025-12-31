@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Card,
     CardContent,
@@ -14,24 +14,25 @@ export default function Pemeriksaan() {
     const [token]= useLocalStorageEncrypt('token', null);
     const [user] = useLocalStorageEncrypt('user', null);
     // Gunakan useState agar list bisa dimanipulasi (dihapus)
-    const [dataPasien, setDataPasien] = useState([
-        { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
-        { id: "002", name: "Siti Aminah", norm: "RM-2023-002" },
-        { id: "003", name: "Andi Wijaya", norm: "RM-2023-003" },
-        { id: "004", name: "Dewi Lestari", norm: "RM-2023-004" },
-    ]);
+    const [dataPasien, setDataPasien] = useState([]);
 
     const getDataPasien= async ()=>{
         try{
             const {data , status}= await Api1('/pasien-today','GET',user,{
                Authorization: `Bearer ${token}`,  
             })
+            if(status === 200){
+                setDataPasien(data.data);
+            }
             console.log(data);
         }catch(error){
             console.log(error);
         }
     }
-    getDataPasien();
+ useEffect(()=>{
+       getDataPasien();
+
+ },[token])
     const [lastSelected, setLastSelected] = useState(null);
 
     const handleSelectPatient = (patient) => {

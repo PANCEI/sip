@@ -85,8 +85,8 @@ export default function PatientList({ patients, onPatientClick, onReload }) {
                                     <PersonIcon color="primary" />
                                 </ListItemIcon>
                                 <ListItemText 
-                                    primary={patient.name} 
-                                    secondary={patient.norm || `No. RM: ${patient.id}`}
+                                    primary={patient.pasien.nama_pasien} 
+                                    secondary={patient.pasien.no_rm || `No. RM: ${patient.id}`}
                                     primaryTypographyProps={{ 
                                         fontWeight: '600', 
                                         color: '#334155',
