@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
-    Card, CardContent, Typography, Paper, Box, TextField, Button,
-    Divider, IconButton, List, ListItem, InputAdornment
+    Typography, Paper, Box, TextField, Button,
+    Divider, IconButton, Chip
 } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
+import HistoryIcon from '@mui/icons-material/History';
 import PatientList from "./PatientList";
 import { useLocalStorageEncrypt } from "../../helper/CostumHook";
 import { Api1 } from "../../utils/Api1";
@@ -19,16 +20,10 @@ export default function Pemeriksaan() {
     const [lastSelected, setLastSelected] = useState(null);
 
     const { register, control, handleSubmit, reset, formState: { errors } } = useForm({
-        defaultValues: {
-            diagnosa: "",
-            obat: [{ nama_obat: "", dosis: "" }]
-        }
+        defaultValues: { diagnosa: "", obat: [{ nama_obat: "", dosis: "" }] }
     });
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "obat"
-    });
+    const { fields, append, remove } = useFieldArray({ control, name: "obat" });
 
     const getDataPasien = async () => {
         try {
@@ -44,117 +39,169 @@ export default function Pemeriksaan() {
     const handleSelectPatient = (patient) => {
         setLastSelected(patient);
         reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "" }] });
+        
+        // MENGHAPUS PASIEN DARI LIST SETELAH DIPILIH
         setDataPasien((prev) => prev.filter((item) => item.id !== patient.id));
     };
 
     const onSubmit = (formData) => {
-        const payload = { ...lastSelected, ...formData };
-        console.log("Payload Simpan:", payload);
-        alert("Data pemeriksaan berhasil disimpan!");
+        console.log("Simpan Data:", { ...lastSelected, ...formData });
+        alert("Pemeriksaan Berhasil Disimpan");
         setLastSelected(null);
     };
 
     return (
-        <Box sx={{ p: 2, backgroundColor: "#f4f6f8", minHeight: "100vh", display: "flex", justifyContent: "center" }}>
-            <Card sx={{ borderRadius: 3, width: "100%", maxWidth: "1600px" }}>
-                <CardContent>
-                    {/* Header */}
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 2 }}>
-                        <Box sx={{ p: 1, bgcolor: "#1976d2", borderRadius: 1, display: "flex" }}>
-                            <AccountBoxIcon sx={{ color: "#fff" }} />
+        <Box sx={{ p: 3, backgroundColor: "#f4f7fa", minHeight: "100vh" }}>
+            
+            {/* HEADER */}
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 2 }}>
+                <Box sx={{ p: 1, bgcolor: "#1976d2", borderRadius: 1.5, display: "flex" }}>
+                    <AccountBoxIcon sx={{ color: "#fff", fontSize: 24 }} />
+                </Box>
+                <Typography variant="h6" fontWeight="800" color="#2c3e50">
+                    {lastSelected ? `Memeriksa: ${lastSelected.pasien.nama_pasien}` : "Pemeriksaan Pasien"}
+                </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+                
+                {/* SISI KIRI: LIST ANTREAN */}
+                <Box sx={{ width: "320px", flexShrink: 0 }}>
+                    <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid #e0e6ed", overflow: "hidden" }}>
+                        <Box sx={{ p: 2, borderBottom: "1px solid #e0e6ed", bgcolor: "#fff" }}>
+                            <Typography variant="subtitle2" fontWeight="700">Antrean Pasien</Typography>
+                            <Typography variant="caption" color="textSecondary">{dataPasien.length} PASIEN TERSEDIA</Typography>
                         </Box>
-                        <Typography variant="h6" fontWeight="800">Pemeriksaan Pasien</Typography>
-                    </Box>
-
-                    {/* Main Container Flex */}
-                    <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 3 }}>
-                        
-                        {/* Sidebar: List Pasien */}
-                        <Box sx={{ width: { xs: "100%", lg: "350px" }, flexShrink: 0 }}>
-                            <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
-                                <Box sx={{ p: 2, bgcolor: "#fff", borderBottom: "1px solid #eee" }}>
-                                    <Typography variant="subtitle2" fontWeight="700">Antrean Pasien</Typography>
-                                </Box>
-                                <PatientList patients={dataPasien} onPatientClick={handleSelectPatient} onReload={getDataPasien} />
-                            </Paper>
+                        <Box sx={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+                            <PatientList 
+                                patients={dataPasien} 
+                                onPatientClick={handleSelectPatient} 
+                                onReload={getDataPasien} 
+                            />
                         </Box>
+                    </Paper>
+                </Box>
 
-                        {/* Content: Form Pemeriksaan */}
-                        <Box sx={{ flexGrow: 1 }}>
-                            <Paper sx={{ p: 4, borderRadius: 2 }}>
-                                {lastSelected ? (
-                                    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                                        <Typography variant="h5" fontWeight="700" color="primary">Form Pemeriksaan</Typography>
-                                        <Divider />
+                {/* SISI KANAN: DETAIL & FORM DENGAN ANIMASI */}
+                <Box sx={{ flexGrow: 1 }}>
+                    {lastSelected ? (
+                        <Box 
+                            key={lastSelected.id} 
+                            sx={{ 
+                                display: "flex", 
+                                gap: 3, 
+                                alignItems: "flex-start",
+                                animation: "slideInRight 0.4s ease-out" 
+                            }}
+                        >
+                            {/* COLUMN 1: DATA PASIEN */}
+                            <Box sx={{ flex: "1 1 350px", display: "flex", flexDirection: "column", gap: 3 }}>
+                                <Paper sx={{ p: 3, borderRadius: 3, border: "1px solid #e0e6ed" }}>
+                                    <Typography variant="caption" fontWeight="700" color="primary" sx={{ display: 'block', mb: 1 }}>DATA PASIEN AKTIF</Typography>
+                                    <Divider sx={{ mb: 2 }} />
+                                    
+                                    <Typography variant="caption" color="textSecondary">Nama Lengkap</Typography>
+                                    <Typography variant="body2" fontWeight="700" sx={{ mb: 2 }}>{lastSelected.pasien.nama_pasien}</Typography>
+                                    
+                                    <Typography variant="caption" color="textSecondary">No. Rekam Medis</Typography>
+                                    <Typography variant="body2" fontWeight="700" sx={{ mb: 2 }}>{lastSelected.pasien.no_rm}</Typography>
 
-                                        {/* Row 1: Info Dasar */}
-                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                                            <TextField sx={{ flex: "1 1 300px" }} label="Nama Pasien" value={lastSelected.pasien.nama_pasien} variant="filled" InputProps={{ readOnly: true }} />
-                                            <TextField sx={{ flex: "1 1 200px" }} label="No. RM" value={lastSelected.pasien.no_rm} variant="filled" InputProps={{ readOnly: true }} />
+                                    <Typography variant="caption" color="textSecondary">Vital Sign</Typography>
+                                    <Box sx={{ mb: 2, mt: 0.5 }}>
+                                        <Chip label={`TD: ${lastSelected.sistolik}/${lastSelected.diastolik}`} size="small" color="primary" variant="outlined" sx={{ fontWeight: 'bold' }} />
+                                    </Box>
+
+                                    <Typography variant="caption" color="textSecondary">Keluhan Utama</Typography>
+                                    <Box sx={{ p: 1.5, bgcolor: "#fffde7", borderRadius: 2, border: "1px solid #fff59d", mt: 0.5 }}>
+                                        <Typography variant="body2">"{lastSelected.keluhan}"</Typography>
+                                    </Box>
+                                </Paper>
+
+                                <Paper sx={{ p: 3, borderRadius: 3, border: "1px solid #e0e6ed" }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+                                        <HistoryIcon fontSize="small" color="action" />
+                                        <Typography variant="subtitle2" fontWeight="700">Riwayat Terakhir</Typography>
+                                    </Box>
+                                    <Divider sx={{ mb: 1 }} />
+                                    <Box>
+                                        <Typography variant="caption" color="primary" fontWeight="700">01 Jan 2026</Typography>
+                                        <Typography variant="body2" fontWeight="700">Diagnosa: Influenza</Typography>
+                                        <Typography variant="caption" color="textSecondary">Obat: Paracetamol, Vitamin C</Typography>
+                                    </Box>
+                                </Paper>
+                            </Box>
+
+                            {/* COLUMN 2: PEMERIKSAAN DOKTER */}
+                            <Paper sx={{ flex: "2 1 600px", p: 4, borderRadius: 3, border: "1px solid #e0e6ed" }}>
+                                <Typography variant="h6" fontWeight="700" color="primary" gutterBottom>Pemeriksaan Dokter</Typography>
+                                <Divider sx={{ mb: 3 }} />
+                                
+                                <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                                    <TextField 
+                                        fullWidth label="Diagnosa / Analisa Medis" multiline rows={6}
+                                        {...register("diagnosa", { required: "Wajib diisi" })}
+                                        error={!!errors.diagnosa}
+                                        helperText={errors.diagnosa?.message}
+                                    />
+
+                                    <Box>
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                            <Typography variant="subtitle2" fontWeight="700">Resep Obat</Typography>
+                                            <Button size="small" startIcon={<AddCircleOutlineIcon />} onClick={() => append({ nama_obat: "", dosis: "" })} sx={{ fontWeight: 'bold' }}>TAMBAH</Button>
                                         </Box>
-
-                                        {/* Row 2: Alamat */}
-                                        <TextField fullWidth label="Alamat" value={lastSelected.pasien.alamat} variant="filled" InputProps={{ readOnly: true }} />
-
-                                        {/* Row 3: Vital Signs */}
-                                        <Box sx={{ display: "flex", gap: 2 }}>
-                                            <TextField sx={{ flex: 1 }} label="Sistolik" value={lastSelected.sistolik} variant="filled" InputProps={{ readOnly: true, endAdornment: "mmHg" }} />
-                                            <TextField sx={{ flex: 1 }} label="Diastolik" value={lastSelected.diastolik} variant="filled" InputProps={{ readOnly: true, endAdornment: "mmHg" }} />
-                                        </Box>
-
-                                        {/* Row 4: Keluhan */}
-                                        <TextField fullWidth label="Keluhan Utama" value={lastSelected.keluhan} multiline rows={4} variant="filled" InputProps={{ readOnly: true }} />
-
-                                        <Divider sx={{ my: 1 }}><Typography variant="caption" color="textSecondary">INPUT MEDIS</Typography></Divider>
-
-                                        {/* Input Diagnosa */}
-                                        <TextField 
-                                            fullWidth label="Diagnosa Dokter" multiline rows={4}
-                                            {...register("diagnosa", { required: "Diagnosa tidak boleh kosong" })}
-                                            error={!!errors.diagnosa}
-                                            helperText={errors.diagnosa?.message}
-                                        />
-
-                                        {/* Input Obat Dinamis */}
-                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                <Typography variant="subtitle1" fontWeight="700">Resep Obat</Typography>
-                                                <Button size="small" startIcon={<AddCircleOutlineIcon />} onClick={() => append({ nama_obat: "", dosis: "" })}>Tambah Obat</Button>
+                                        {fields.map((item, index) => (
+                                            <Box key={item.id} sx={{ display: "flex", gap: 1.5, mb: 1.5 }}>
+                                                <TextField 
+                                                    sx={{ flex: 3 }} label="Nama Obat" size="small"
+                                                    {...register(`obat.${index}.nama_obat`, { required: true })}
+                                                />
+                                                <TextField 
+                                                    sx={{ flex: 2 }} label="Aturan Pakai" size="small"
+                                                    {...register(`obat.${index}.dosis`, { required: true })}
+                                                />
+                                                <IconButton color="error" onClick={() => remove(index)} disabled={fields.length === 1}>
+                                                    <DeleteIcon />
+                                                </IconButton>
                                             </Box>
-                                            
-                                            {fields.map((item, index) => (
-                                                <Box key={item.id} sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
-                                                    <TextField 
-                                                        sx={{ flex: 3 }} label="Nama Obat" size="small"
-                                                        {...register(`obat.${index}.nama_obat`, { required: true })}
-                                                        error={!!errors.obat?.[index]?.nama_obat}
-                                                    />
-                                                    <TextField 
-                                                        sx={{ flex: 2 }} label="Dosis/Aturan" size="small"
-                                                        {...register(`obat.${index}.dosis`, { required: true })}
-                                                        error={!!errors.obat?.[index]?.dosis}
-                                                    />
-                                                    <IconButton color="error" onClick={() => remove(index)} disabled={fields.length === 1}>
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                </Box>
-                                            ))}
-                                        </Box>
+                                        ))}
+                                    </Box>
 
-                                        <Button type="submit" variant="contained" size="large" startIcon={<SaveIcon />} sx={{ py: 1.5, mt: 2 }}>
-                                            Simpan Rekam Medis
-                                        </Button>
-                                    </Box>
-                                ) : (
-                                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px", border: "2px dashed #eee", borderRadius: 2 }}>
-                                        <Typography color="textSecondary">Pilih pasien untuk memulai pemeriksaan</Typography>
-                                    </Box>
-                                )}
+                                    <Button 
+                                        fullWidth type="submit" variant="contained" 
+                                        size="large" startIcon={<SaveIcon />}
+                                        sx={{ py: 1.5, mt: 2, fontWeight: "bold", borderRadius: 2 }}
+                                    >
+                                        SIMPAN REKAM MEDIS
+                                    </Button>
+                                </Box>
                             </Paper>
                         </Box>
-                    </Box>
-                </CardContent>
-            </Card>
+                    ) : (
+                        <Paper sx={{ 
+                            height: "500px", display: "flex", justifyContent: "center", 
+                            alignItems: "center", borderRadius: 3, border: "2px dashed #cbd5e1",
+                            bgcolor: "transparent"
+                        }}>
+                            <Typography color="textSecondary">Silakan pilih pasien dari antrean untuk memulai pemeriksaan</Typography>
+                        </Paper>
+                    )}
+                </Box>
+            </Box>
+
+            <style>
+                {`
+                    @keyframes slideInRight {
+                        from {
+                            opacity: 0;
+                            transform: translateX(100px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                    }
+                `}
+            </style>
         </Box>
     );
-}
+} 
