@@ -46,24 +46,26 @@ export default function Pemeriksaan() {
     };
     const handleReloadData = () => {
         console.log("Mengambil data ulang...");
+          getDataPasien();
         // Contoh reset data dummy
-        setDataPasien([
-            { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
-            { id: "002", name: "Siti Aminah", norm: "RM-2023-002" },
-            { id: "003", name: "Andi Wijaya", norm: "RM-2023-003" },
-        ]);
+        // setDataPasien([
+        //     { id: "001", name: "Budi Santoso", norm: "RM-2023-001" },
+        //     { id: "002", name: "Siti Aminah", norm: "RM-2023-002" },
+        //     { id: "003", name: "Andi Wijaya", norm: "RM-2023-003" },
+        // ]);
     };
-    return (
+  return (
         <Box sx={{ p: { xs: 1, md: 2 }, backgroundColor: "#f4f6f8", minHeight: "100vh", display: "flex", justifyContent: "center" }}>
             <Card sx={{ borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: "100%", maxWidth: "1800px" }}>
                 <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                    {/* Header tetap sama */}
                     <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                        <Box sx={{ p: 1, backgroundColor: "#1976d2", borderRadius: 1.5, display: "flex", mr: 2 }}>
-                            <AccountBoxIcon sx={{ color: "#fff", fontSize: 24 }} />
-                        </Box>
-                        <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
-                            Pemeriksaan Pasien
-                        </Typography>
+                         <Box sx={{ p: 1, backgroundColor: "#1976d2", borderRadius: 1.5, display: "flex", mr: 2 }}>
+                             <AccountBoxIcon sx={{ color: "#fff", fontSize: 24 }} />
+                         </Box>
+                         <Typography variant="h6" fontWeight="800" sx={{ color: "#2c3e50" }}>
+                             Pemeriksaan Pasien
+                         </Typography>
                     </Box>
 
                     <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 3, alignItems: "flex-start" }}>
@@ -76,36 +78,29 @@ export default function Pemeriksaan() {
                                     </Typography>
                                 </Box>
                                 <Box sx={{ maxHeight: '500px', overflowY: 'auto' }}>
-                                    {dataPasien.length > 0 ? (
-                                        <PatientList
-                                            patients={dataPasien}
-                                            onPatientClick={handleSelectPatient}
-                                            onReload={handleReloadData} // Pasang fungsi reload di sini
-                                        />
-                                    ) : (
-                                        <Box sx={{ p: 3, textAlign: 'center' }}>
-                                            <Typography variant="body2" color="textSecondary">
-                                                Tidak ada pasien dalam antrean
-                                            </Typography>
-                                        </Box>
-                                    )}
+                                    {/* PERBAIKAN: Selalu render PatientList agar tombol reload selalu ada */}
+                                    <PatientList
+                                        patients={dataPasien}
+                                        onPatientClick={handleSelectPatient}
+                                        onReload={handleReloadData} 
+                                    />
                                 </Box>
                             </Paper>
                         </Box>
 
-                        {/* SISI KANAN: AREA DETAIL */}
+                        {/* SISI KANAN: AREA DETAIL tetap sama */}
                         <Box sx={{ flex: "1 1 auto", width: "100%", minWidth: 0 }}>
-                            <Paper sx={{ p: 4, borderRadius: 3, border: '2px dashed #e2e8f0', bgcolor: '#f8fafc', textAlign: 'center' }}>
-                                {lastSelected ? (
-                                    <Typography variant="h6" color="primary">
-                                        Memproses Pemeriksaan: {lastSelected.name}
-                                    </Typography>
-                                ) : (
-                                    <Typography color="textSecondary">
-                                        Pilih pasien untuk memulai pemeriksaan
-                                    </Typography>
-                                )}
-                            </Paper>
+                             <Paper sx={{ p: 4, borderRadius: 3, border: '2px dashed #e2e8f0', bgcolor: '#f8fafc', textAlign: 'center' }}>
+                                 {lastSelected ? (
+                                     <Typography variant="h6" color="primary">
+                                         Memproses Pemeriksaan: {lastSelected.pasien.nama_pasien}
+                                     </Typography>
+                                 ) : (
+                                     <Typography color="textSecondary">
+                                         Pilih pasien untuk memulai pemeriksaan
+                                     </Typography>
+                                 )}
+                             </Paper>
                         </Box>
                     </Box>
                 </CardContent>
