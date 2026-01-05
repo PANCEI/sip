@@ -15,7 +15,7 @@ export default function Pemeriksaan() {
     const [lastSelected, setLastSelected] = useState(null);
 
     const { register, control, handleSubmit, reset, setValue, formState: { errors } } = useForm({
-        defaultValues: { diagnosa: "", obat: [{ nama_obat: "", dosis: "", id_obat: "" }] }
+        defaultValues: { diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "" , jumlah:""}] }
     });
 
     const { fields, append, remove } = useFieldArray({ control, name: "obat" });
@@ -33,7 +33,7 @@ export default function Pemeriksaan() {
 
     const handleSelectPatient = (patient) => {
         setLastSelected(patient);
-        reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "", id_obat: "" }] });
+        reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "", jumlah:"" }] });
         // Hapus dari list antrean
         setDataPasien((prev) => prev.filter((item) => item.id !== patient.id));
     };
@@ -72,9 +72,9 @@ export default function Pemeriksaan() {
                                 <InfoPasien patient={lastSelected} />
                             </Box>
                             <Paper sx={{ flex: "2 1 600px", p: 4, borderRadius: 3, border: "1px solid #e0e6ed" }}>
-                                <FormPemeriksaan 
-                                    register={register} control={control} fields={fields} append={append} 
-                                    remove={remove} handleSubmit={handleSubmit} onSubmit={onSubmit} 
+                                <FormPemeriksaan
+                                    register={register} control={control} fields={fields} append={append}
+                                    remove={remove} handleSubmit={handleSubmit} onSubmit={onSubmit}
                                     errors={errors} setValue={setValue} token={token} user={user}
                                 />
                             </Paper>

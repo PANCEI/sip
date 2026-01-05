@@ -61,10 +61,10 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Typography variant="subtitle2" fontWeight="700">Resep Obat</Typography>
                     {/* PERUBAHAN: Tambahkan 'jumlah' di append */}
-                    <Button 
-                        size="small" 
-                        startIcon={<AddCircleOutlineIcon />} 
-                        onClick={() => append({ nama_obat: "", dosis: "", kode_obat: "", jumlah: 1 })}
+                    <Button
+                        size="small"
+                        startIcon={<AddCircleOutlineIcon />}
+                        onClick={() => append({ nama_obat: "", dosis: "", kode_obat: "", jumlah: "" })}
                     >
                         TAMBAH OBAT
                     </Button>
@@ -92,41 +92,44 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                                     {...params}
                                     label="Cari Obat..."
                                     size="small"
-                                    InputProps={{
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                                {params.InputProps.endAdornment}
-                                            </>
-                                        ),
+                                    // GANTI InputProps menjadi slotProps
+                                    slotProps={{
+                                        input: {
+                                            ...params.InputProps,
+                                            endAdornment: (
+                                                <>
+                                                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                    {params.InputProps.endAdornment}
+                                                </>
+                                            ),
+                                        },
                                     }}
                                 />
                             )}
                         />
 
                         {/* INPUTAN DOSIS */}
-                        <TextField 
-                            sx={{ flex: 2 }} 
-                            label="Dosis/Aturan" 
+                        <TextField
+                            sx={{ flex: 2 }}
+                            label="Dosis/Aturan"
                             placeholder="3x1"
-                            size="small" 
-                            {...register(`obat.${index}.dosis`)} 
+                            size="small"
+                            {...register(`obat.${index}.dosis`)}
                         />
 
                         {/* PERUBAHAN: INPUTAN JUMLAH OBAT */}
-                        <TextField 
-                            sx={{ flex: 1.2 }} 
-                            label="Jumlah" 
+                        <TextField
+                            sx={{ flex: 1.2 }}
+                            label="Jumlah"
                             type="number"
-                            size="small" 
-                            inputProps={{ min: 1 }}
-                            {...register(`obat.${index}.jumlah`, { required: true })} 
+                            size="small"
+                           
+                            {...register(`obat.${index}.jumlah`, { required: true })}
                         />
 
-                        <IconButton 
-                            color="error" 
-                            onClick={() => remove(index)} 
+                        <IconButton
+                            color="error"
+                            onClick={() => remove(index)}
                             disabled={fields.length === 1}
                             sx={{ mt: 0.5 }}
                         >
