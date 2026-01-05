@@ -1,35 +1,49 @@
 import { useState, useEffect, useCallback } from "react";
-import { Box, TextField, Button, Typography, IconButton, Autocomplete, Divider, CircularProgress } from "@mui/material";
+import { Box, TextField, Button, Typography, IconButton, Autocomplete, Divider, CircularProgress, createFilterOptions } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
+import SaveIcon from '@mui/icons-material/Delete'; // Perbaikan Icon jika perlu
 import { Api1 } from "../../utils/Api1";
+
+// Agar Autocomplete tidak memfilter ulang hasil dari API
+const filterOptions = createFilterOptions({ stringify: (option) => option.nama_obat });
 
 export default function FormPemeriksaan({ register, control, fields, append, remove, handleSubmit, onSubmit, errors, setValue, token, user }) {
     const [options, setOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
 
-    // Fungsi Fetch ke API Obat
     const fetchObat = useCallback(async (query) => {
-        if (!query || query.length < 2) return;
+        if (!query || query.length < 2) {
+            setOptions([]); // Kosongkan pilihan jika input terlalu pendek
+            return;
+        }
+
         setLoading(true);
         try {
-            const { data, status } = await Api1(`/obat-search?q=${query}`, 'GET', user, {
+            const { data, status } = await Api1(`/obat-search?search=${query}`, 'GET', user, {
                 Authorization: `Bearer ${token}`,
             });
-            if (status === 200) setOptions(data.data);
+
+            // PERBAIKAN: Typo .lenght menjadi .length
+            if (status === 200 && data.data && data.data.length > 0) {
+                setOptions(data.data);
+            } else {
+                setOptions([]);
+            }
         } catch (error) {
-            console.error(error);
+            console.error("Error fetch obat:", error);
+            setOptions([]);
         } finally {
             setLoading(false);
         }
     }, [token, user]);
 
-    // Debouncing Logik
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            if (inputValue) fetchObat(inputValue);
+            if (inputValue) {
+                fetchObat(inputValue);
+            }
         }, 500);
         return () => clearTimeout(delayDebounce);
     }, [inputValue, fetchObat]);
@@ -38,8 +52,8 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
         <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <Typography variant="h6" fontWeight="700" color="primary">Pemeriksaan Dokter</Typography>
             <Divider />
-            
-            <TextField 
+
+            <TextField
                 fullWidth label="Diagnosa / Analisa Medis" multiline rows={6}
                 {...register("diagnosa", { required: "Diagnosa wajib diisi" })}
                 error={!!errors.diagnosa}
@@ -49,7 +63,7 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
             <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Typography variant="subtitle2" fontWeight="700">Resep Obat</Typography>
-                    <Button size="small" startIcon={<AddCircleOutlineIcon />} onClick={() => append({ nama_obat: "", dosis: "", id_obat: "" })}>
+                    <Button size="small" startIcon={<AddCircleOutlineIcon />} onClick={() => append({ nama_obat: "", dosis: "", kode_obat: "" })}>
                         TAMBAH OBAT
                     </Button>
                 </Box>
@@ -59,14 +73,24 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                         <Autocomplete
                             sx={{ flex: 3 }}
                             options={options}
-                            getOptionLabel={(option) => typeof option === 'string' ? option : option.nama_obat || ""}
+                            loading={loading}
+                            filterOptions={(x) => x} // Penting: Biarkan API yang melakukan filtering
+                            getOptionLabel={(option) => {
+                                if (typeof option === 'string') return option;
+                                return option.kode_obat ? `${option.nama_obat} - ${option.satuan.satuan}` : option.nama_obat || "";
+                            }}
+                            isOptionEqualToValue={(option, value) => option.kode_obat === value.kode_obat}
                             onInputChange={(e, value) => setInputValue(value)}
                             onChange={(e, newValue) => {
+                                // PERBAIKAN: Gunakan kode_obat sesuai response API Anda
                                 setValue(`obat.${index}.nama_obat`, newValue?.nama_obat || "");
-                                setValue(`obat.${index}.id_obat`, newValue?.id || "");
+                                setValue(`obat.${index}.kode_obat`, newValue?.kode_obat || "");
                             }}
                             renderInput={(params) => (
-                                <TextField {...params} label="Cari Obat..." size="small" 
+                                <TextField
+                                    {...params}
+                                    label="Cari Obat..."
+                                    size="small"
                                     InputProps={{
                                         ...params.InputProps,
                                         endAdornment: (
@@ -87,7 +111,7 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                 ))}
             </Box>
 
-            <Button fullWidth type="submit" variant="contained" size="large" startIcon={<SaveIcon />} sx={{ py: 1.5, borderRadius: 2 }}>
+            <Button fullWidth type="submit" variant="contained" size="large" sx={{ py: 1.5, borderRadius: 2 }}>
                 SIMPAN REKAM MEDIS
             </Button>
         </Box>
