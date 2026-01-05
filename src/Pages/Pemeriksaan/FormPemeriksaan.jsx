@@ -2,10 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Box, TextField, Button, Typography, IconButton, Autocomplete, Divider, CircularProgress, createFilterOptions } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Delete'; // Perbaikan Icon jika perlu
 import { Api1 } from "../../utils/Api1";
 
-// Agar Autocomplete tidak memfilter ulang hasil dari API
 const filterOptions = createFilterOptions({ stringify: (option) => option.nama_obat });
 
 export default function FormPemeriksaan({ register, control, fields, append, remove, handleSubmit, onSubmit, errors, setValue, token, user }) {
@@ -15,7 +13,7 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
 
     const fetchObat = useCallback(async (query) => {
         if (!query || query.length < 2) {
-            setOptions([]); // Kosongkan pilihan jika input terlalu pendek
+            setOptions([]);
             return;
         }
 
@@ -25,7 +23,6 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                 Authorization: `Bearer ${token}`,
             });
 
-            // PERBAIKAN: Typo .lenght menjadi .length
             if (status === 200 && data.data && data.data.length > 0) {
                 setOptions(data.data);
             } else {
@@ -63,26 +60,30 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
             <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Typography variant="subtitle2" fontWeight="700">Resep Obat</Typography>
-                    <Button size="small" startIcon={<AddCircleOutlineIcon />} onClick={() => append({ nama_obat: "", dosis: "", kode_obat: "" })}>
+                    {/* PERUBAHAN: Tambahkan 'jumlah' di append */}
+                    <Button 
+                        size="small" 
+                        startIcon={<AddCircleOutlineIcon />} 
+                        onClick={() => append({ nama_obat: "", dosis: "", kode_obat: "", jumlah: 1 })}
+                    >
                         TAMBAH OBAT
                     </Button>
                 </Box>
 
                 {fields.map((item, index) => (
-                    <Box key={item.id} sx={{ display: "flex", gap: 1.5, mb: 2 }}>
+                    <Box key={item.id} sx={{ display: "flex", gap: 1.5, mb: 2, alignItems: "flex-start" }}>
                         <Autocomplete
-                            sx={{ flex: 3 }}
+                            sx={{ flex: 4 }}
                             options={options}
                             loading={loading}
-                            filterOptions={(x) => x} // Penting: Biarkan API yang melakukan filtering
+                            filterOptions={(x) => x}
                             getOptionLabel={(option) => {
                                 if (typeof option === 'string') return option;
-                                return option.kode_obat ? `${option.nama_obat} - ${option.satuan.satuan}` : option.nama_obat || "";
+                                return option.kode_obat ? `${option.nama_obat} - ${option.satuan?.satuan || ''}` : option.nama_obat || "";
                             }}
                             isOptionEqualToValue={(option, value) => option.kode_obat === value.kode_obat}
                             onInputChange={(e, value) => setInputValue(value)}
                             onChange={(e, newValue) => {
-                                // PERBAIKAN: Gunakan kode_obat sesuai response API Anda
                                 setValue(`obat.${index}.nama_obat`, newValue?.nama_obat || "");
                                 setValue(`obat.${index}.kode_obat`, newValue?.kode_obat || "");
                             }}
@@ -103,8 +104,32 @@ export default function FormPemeriksaan({ register, control, fields, append, rem
                                 />
                             )}
                         />
-                        <TextField sx={{ flex: 2 }} label="Dosis" size="small" {...register(`obat.${index}.dosis`)} />
-                        <IconButton color="error" onClick={() => remove(index)} disabled={fields.length === 1}>
+
+                        {/* INPUTAN DOSIS */}
+                        <TextField 
+                            sx={{ flex: 2 }} 
+                            label="Dosis/Aturan" 
+                            placeholder="3x1"
+                            size="small" 
+                            {...register(`obat.${index}.dosis`)} 
+                        />
+
+                        {/* PERUBAHAN: INPUTAN JUMLAH OBAT */}
+                        <TextField 
+                            sx={{ flex: 1.2 }} 
+                            label="Jumlah" 
+                            type="number"
+                            size="small" 
+                            inputProps={{ min: 1 }}
+                            {...register(`obat.${index}.jumlah`, { required: true })} 
+                        />
+
+                        <IconButton 
+                            color="error" 
+                            onClick={() => remove(index)} 
+                            disabled={fields.length === 1}
+                            sx={{ mt: 0.5 }}
+                        >
                             <DeleteIcon />
                         </IconButton>
                     </Box>
