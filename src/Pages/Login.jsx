@@ -80,7 +80,7 @@ const Login = () => {
    // handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
    // navigate("/")
      handleOpenDialog('Login Berhasil!', 'Selamat datang kembali.');
-      navigate("/"); // Navigasi setelah login berhasil
+     navigate("/"); // Navigasi setelah login berhasil
     }
 
   };

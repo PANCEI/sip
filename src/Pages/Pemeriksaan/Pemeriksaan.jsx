@@ -10,7 +10,7 @@ import { Api1 } from "../../utils/Api1";
 
 export default function Pemeriksaan() {
     const [token] = useLocalStorageEncrypt('token', null);
-    const [user] = useLocalStorageEncrypt('user', null);
+    const [user] = useLocalStorageEncrypt('akses', null);
     const [dataPasien, setDataPasien] = useState([]);
     const [lastSelected, setLastSelected] = useState(null);
 
@@ -21,8 +21,9 @@ export default function Pemeriksaan() {
     const { fields, append, remove } = useFieldArray({ control, name: "obat" });
 
     const getDataPasien = async () => {
+        console.log(user);
         try {
-            const { data, status } = await Api1('/pasien-today', 'GET', user, {
+            const { data, status } = await Api1('/pasien-today', 'POST', {user}, {
                 Authorization: `Bearer ${token}`,
             });
             if (status === 200) setDataPasien(data.data);
