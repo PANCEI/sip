@@ -10,7 +10,8 @@ import { Api1 } from "../../utils/Api1";
 
 export default function Pemeriksaan() {
     const [token] = useLocalStorageEncrypt('token', null);
-    const [user] = useLocalStorageEncrypt('akses', null);
+    const [user] = useLocalStorageEncrypt('user', null);
+    const [akses] = useLocalStorageEncrypt('akses', null);
     const [dataPasien, setDataPasien] = useState([]);
     const [lastSelected, setLastSelected] = useState(null);
 
@@ -23,7 +24,11 @@ export default function Pemeriksaan() {
     const getDataPasien = async () => {
         console.log(user);
         try {
-            const { data, status } = await Api1('/pasien-today', 'POST', {user}, {
+            const { data, status } = await Api1('/pasien-today', 'POST', {
+                akses:akses,
+                user:user
+
+            }, {
                 Authorization: `Bearer ${token}`,
             });
             if (status === 200) setDataPasien(data.data);
