@@ -44,9 +44,25 @@ export default function Pemeriksaan() {
         setDataPasien((prev) => prev.filter((item) => item.id !== patient.id));
     };
 
-    const onSubmit = (formData) => {
+    const onSubmit = async (formData) => {
         console.log("Payload ke API:", { rekam_medis: formData, pasien: lastSelected });
+        try{
+            const {data , status } = await Api1('/pemeriksaan-pasien','POST',{
+                id_pemeriksaan:lastSelected.id,
+                diagnosa:formData.diagnosa,
+                dokter:user.name,
+                rekam_medis:formData,
+                pasien:lastSelected,
+                user:user
+            },{
+                 Authorization: `Bearer ${token}` 
+            });
+            console.log(data);
+        }catch(error){
+            console.log('gagal mendapatkan data dari api', error);
+        }
         alert("Data Berhasil Disimpan");
+    
         setLastSelected(null);
     };
 
