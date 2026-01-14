@@ -52,7 +52,7 @@ export default function Pemeriksaan() {
     };
     const handleSelectPatient = (patient) => {
         setLastSelected(patient);
-        getriwayat(patient);
+        getriwayat(patient.id_pasien);
         reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "", jumlah: "" }] });
         // Hapus dari list antrean
         setDataPasien((prev) => prev.filter((item) => item.id !== patient.id));
