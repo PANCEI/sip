@@ -1,6 +1,6 @@
 import { Paper, Typography, Divider, Box, Chip } from "@mui/material";
 import HistoryIcon from '@mui/icons-material/History';
-
+import { Api1 } from "../../utils/Api1";
 export default function InfoPasien({ patient }) {
     if (!patient) return null;
 
