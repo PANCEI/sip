@@ -14,9 +14,9 @@ export default function Pemeriksaan() {
     const [akses] = useLocalStorageEncrypt('akses', null);
     const [dataPasien, setDataPasien] = useState([]);
     const [lastSelected, setLastSelected] = useState(null);
-
+    const [riwayat, setRiwayat] = useState([]);
     const { register, control, handleSubmit, reset, setValue, formState: { errors } } = useForm({
-        defaultValues: { diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "" , jumlah:""}] }
+        defaultValues: { diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "", jumlah: "" }] }
     });
 
     const { fields, append, remove } = useFieldArray({ control, name: "obat" });
@@ -25,8 +25,8 @@ export default function Pemeriksaan() {
         console.log(user);
         try {
             const { data, status } = await Api1('/pasien-today', 'POST', {
-                akses:akses,
-                user:user
+                akses: akses,
+                user: user
 
             }, {
                 Authorization: `Bearer ${token}`,
@@ -36,33 +36,47 @@ export default function Pemeriksaan() {
     };
 
     useEffect(() => { getDataPasien(); }, [token]);
-
+    const getriwayat = async (pasien) => {
+        //     const getriwayat = await Api1('/riwayat-pemeriksaan','GET',{},{
+        //         Authorization: `Bearer ${token}` 
+        //    }).then((response) => {
+        //         setRiwayat(response.data.data);
+        //    }).catch((error) => {
+        //         console.log('gagal mendapatkan data dari api', error);
+        //    });
+        try {
+            console.log('data pasiepn', pasien);
+        } catch (error) {
+            console.log('gagal mendapatkan data dari api', error);
+        }
+    };
     const handleSelectPatient = (patient) => {
         setLastSelected(patient);
-        reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "", jumlah:"" }] });
+        getriwayat(patient);
+        reset({ diagnosa: "", obat: [{ nama_obat: "", dosis: "", kode_obat: "", jumlah: "" }] });
         // Hapus dari list antrean
         setDataPasien((prev) => prev.filter((item) => item.id !== patient.id));
     };
 
     const onSubmit = async (formData) => {
         console.log("Payload ke API:", { rekam_medis: formData, pasien: lastSelected });
-        try{
-            const {data , status } = await Api1('/pemeriksaan-pasien','POST',{
-                id_pemeriksaan:lastSelected.id,
-                diagnosa:formData.diagnosa,
-                dokter:user.name,
-                rekam_medis:formData,
-                pasien:lastSelected,
-                user:user
-            },{
-                 Authorization: `Bearer ${token}` 
+        try {
+            const { data, status } = await Api1('/pemeriksaan-pasien', 'POST', {
+                id_pemeriksaan: lastSelected.id,
+                diagnosa: formData.diagnosa,
+                dokter: user.name,
+                rekam_medis: formData,
+                pasien: lastSelected,
+                user: user
+            }, {
+                Authorization: `Bearer ${token}`
             });
             console.log(data);
-        }catch(error){
+        } catch (error) {
             console.log('gagal mendapatkan data dari api', error);
         }
         alert("Data Berhasil Disimpan");
-    
+
         setLastSelected(null);
     };
 
