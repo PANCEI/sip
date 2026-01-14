@@ -46,6 +46,11 @@ export default function Pemeriksaan() {
         //    });
         try {
             console.log('data pasiepn', pasien);
+            const {data , status } = await Api1('/history-pasien','POST', {
+                id_pasien : pasien},{
+                Authorization: `Bearer ${token}` 
+           });
+           console.log('data riwayat', data);
         } catch (error) {
             console.log('gagal mendapatkan data dari api', error);
         }
